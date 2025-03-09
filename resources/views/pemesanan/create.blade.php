@@ -20,7 +20,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('pemesanan.store') }}" method="POST">
+                <form action="/pemesanan/store" method="POST" id="bookingForm">
                     @csrf
 
                     <div class="mb-3">
@@ -39,7 +39,7 @@
                             <option value="5">Lapangan 5</option>
                         </select>
                     </div>
-                    
+
 
                     <div class="mb-3 w-25">
                         <label for="jam_mulai" class="form-label">Jam Mulai:</label>
@@ -66,12 +66,50 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Pesan</button>
+                        <button type="button" class="btn btn-primary" onclick="processPayment()">Pesan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+    </script>
+    <script>
+        function processPayment() {
+            let dpAmount = document.querySelector('input[name="dp"]').value; // Ambil nilai DP
 
+            // Kirim permintaan ke server untuk mendapatkan snapToken
+            fetch("/pemesanan/getSnapToken", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    },
+                    body: JSON.stringify({
+                        dp: dpAmount,
+                        nama_tim: document.querySelector('input[name="nama_tim"]').value,
+                        no_telepon: document.querySelector('input[name="no_telepon"]').value,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    snap.pay(data.snapToken, {
+                        onSuccess: function(result) {
+                            console.log("Success:", result);
+                            document.getElementById('bookingForm').submit();
+                        },
+                        onPending: function(result) {
+                            console.log("Pending:", result);
+                            alert("Menunggu pembayaran...");
+                        },
+                        onError: function(result) {
+                            console.log("Error:", result);
+                            alert("Pembayaran gagal! Cek console log untuk detail.");
+                        }
+                    });
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </x-app-layout>

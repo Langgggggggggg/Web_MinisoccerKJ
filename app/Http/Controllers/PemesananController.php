@@ -125,4 +125,25 @@ class PemesananController extends Controller
             Log::error('Gagal mengirim notifikasi WhatsApp: ' . $response->body());
         }
     }
+    public function getSnapToken(Request $request)
+    {
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'BOOK-' . strtoupper(uniqid()), // Buat order ID unik
+                'gross_amount' => (int) $request->dp, // Gunakan nilai DP sebagai gross_amount
+            ],
+            'customer_details' => [
+                'first_name' => $request->nama_tim,
+                'phone' => $request->no_telepon,
+            ],
+        ];
+
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+        return response()->json(['snapToken' => $snapToken]);
+    }
 }
