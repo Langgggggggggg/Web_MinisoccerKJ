@@ -8,16 +8,28 @@ use App\Models\Jadwal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class PemesananController extends Controller
 {
+    public function index()
+    {
+        // Mengambil pemesanan hanya untuk user yang sedang login
+        $pemesanan = Pemesanan::where('user_id', Auth::id())
+            ->with('jadwal')  // Memastikan jadwal ikut dimuat
+            ->get();
+
+        // Mengelompokkan pemesanan berdasarkan kode pemesanan
+        $groupedPemesanan = $pemesanan->groupBy('kode_pemesanan');
+
+        return view('pemesanan.detail', compact('groupedPemesanan'));
+    }
     public function create()
     {
         $jadwals = Jadwal::orderBy('tanggal')->orderBy('jam')->get();
         return view('pemesanan.create', compact('jadwals'));
     }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -41,48 +53,85 @@ class PemesananController extends Controller
             ->where('jam', '<', $request->jam_selesai) // Hanya hingga sebelum jam selesai
             ->get();
 
-        if ($jadwals->isEmpty()) {
-            return back()->withErrors(['error' => 'Jadwal yang dipilih tidak tersedia!']);
-        }
-
-        // Cek apakah jadwal sudah dipesan
-        foreach ($jadwals as $jadwal) {
-            if (Pemesanan::where('jadwal_id', $jadwal->id)->exists()) {
-                return back()->withErrors(['error' => 'Sebagian atau semua jadwal yang dipilih sudah dipesan!']);
-            }
-        }
-
         $kode_pemesanan = 'BOOK-' . strtoupper(uniqid());
 
-        // Simpan setiap jadwal yang dipilih ke tabel pemesanan
         DB::beginTransaction();
         try {
             foreach ($jadwals as $index => $jadwal) {
-                $pemesanan = Pemesanan::create([
-                    'user_id' => auth()->id(),
-                    'kode_pemesanan' => $kode_pemesanan,
-                    'jadwal_id' => $jadwal->id,
-                    'tanggal' => $request->tanggal,
-                    'jam_mulai' => $request->jam_mulai,
-                    'jam_selesai' => $request->jam_selesai,
-                    'nama_tim' => $request->nama_tim,
-                    'no_telepon' => $request->no_telepon,
-                    'dp' => $index === 0 ? $request->dp : null, // Hanya jam pertama yang memiliki DP
-                ]);
+                // Hitung durasi bermain dalam jam
+                $durasi = (strtotime($request->jam_selesai) - strtotime($request->jam_mulai)) / 3600;
+
+                // Tentukan harga berdasarkan lapangan dan waktu
+                if ($jadwal->lapangan >= 1 && $jadwal->lapangan <= 3) {
+                    $harga_per_jam = ($request->jam_mulai >= '07:00' && $request->jam_mulai < '17:00') ? 300000 : 350000;
+                } elseif ($jadwal->lapangan >= 4 && $jadwal->lapangan <= 5) {
+                    $harga_per_jam = ($request->jam_mulai >= '07:00' && $request->jam_mulai < '17:00') ? 400000 : 450000;
+                } else {
+                    $harga_per_jam = 0; // Jaga-jaga jika ada input tidak valid
+                }
+
+                // Hitung total harga lapangan
+                $total_harga = $harga_per_jam * $durasi;
+
+                // Hitung sisa bayar
+                $dp = $index === 0 ? $request->dp : 0; // Hanya jam pertama yang memiliki DP
+                $sisa_bayar = max(0, $total_harga - $dp); // Pastikan sisa bayar tidak negatif
+
+                // Tentukan status pembayaran
+                $status = ($sisa_bayar == 0) ? 'lunas' : 'belum lunas';
+
+                $user = Auth::user();
+                if ($user) {
+                    $pemesanan = Pemesanan::create([
+                        'user_id' => $user->id,
+                        'kode_pemesanan' => $kode_pemesanan,
+                        'jadwal_id' => $jadwal->id,
+                        'tanggal' => $request->tanggal,
+                        'jam_mulai' => $request->jam_mulai,
+                        'jam_selesai' => $request->jam_selesai,
+                        'nama_tim' => $request->nama_tim,
+                        'no_telepon' => $request->no_telepon,
+                        'dp' => $index === 0 ? $request->dp : null,
+                        'sisa_bayar' => $sisa_bayar,
+                        'status' => $status,
+                    ]);
+                } else {
+                    return response()->json(['error' => 'User not authenticated'], 401);
+                }
             }
 
-            // Mengirimkan notifikasi WhatsApp
+            // Kirim Notifikasi WhatsApp
             $this->KirimNotifikasiWhatsApp($pemesanan);
 
             DB::commit();
-            return redirect()->route('jadwal.index')->with('success', 'Pemesanan berhasil!');
+            return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
+    public function validateSchedule(Request $request)
+    {
+        $jadwals = Jadwal::where('tanggal', $request->tanggal)
+            ->where('lapangan', $request->lapangan)
+            ->where('jam', '>=', $request->jam_mulai)
+            ->where('jam', '<', $request->jam_selesai)
+            ->get();
 
+        if ($jadwals->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Jadwal yang dipilih tidak tersedia!']);
+        }
+
+        foreach ($jadwals as $jadwal) {
+            if (Pemesanan::where('jadwal_id', $jadwal->id)->exists()) {
+                return response()->json(['success' => false, 'message' => 'Sebagian atau semua jadwal yang dipilih sudah dipesan!']);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+    
     private function KirimNotifikasiWhatsApp(Pemesanan $pemesanan)
     {
         $phoneNumber = $pemesanan->no_telepon;

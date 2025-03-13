@@ -25,6 +25,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan/store', [PemesananController::class, 'store'])->name('pemesanan.store');
+    Route::get('/pemesanan/detail', [PemesananController::class, 'index'])->name('pemesanan.detail');
+    Route::post('/pemesanan/validateSchedule', [PemesananController::class, 'validateSchedule']);
     Route::post('/pemesanan/getSnapToken', [PemesananController::class, 'getSnapToken'])->name('pemesanan.getSnapToken');
 });
 //untuk admin 

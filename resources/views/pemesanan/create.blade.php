@@ -1,10 +1,10 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Pemesanan
-        </h2>
-    </x-slot>
-    <div class="container mt-5">
+@extends('layouts.app')
+
+@section('header')
+    @include('layouts.header')
+@endsection
+@section('content')
+    <div class="container">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h2 class="card-title">Form Pemesanan Lapangan</h2>
@@ -69,6 +69,7 @@
                         <button type="button" class="btn btn-primary" onclick="processPayment()">Pesan</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -76,40 +77,65 @@
     </script>
     <script>
         function processPayment() {
-            let dpAmount = document.querySelector('input[name="dp"]').value; // Ambil nilai DP
+            let formData = {
+                tanggal: document.querySelector('input[name="tanggal"]').value,
+                lapangan: document.querySelector('select[name="lapangan"]').value,
+                jam_mulai: document.querySelector('input[name="jam_mulai"]').value,
+                jam_selesai: document.querySelector('input[name="jam_selesai"]').value,
+                nama_tim: document.querySelector('input[name="nama_tim"]').value,
+                no_telepon: document.querySelector('input[name="no_telepon"]').value,
+                dp: document.querySelector('input[name="dp"]').value,
+            };
 
-            // Kirim permintaan ke server untuk mendapatkan snapToken
-            fetch("/pemesanan/getSnapToken", {
+            // Kirim permintaan validasi jadwal ke server
+            fetch("/pemesanan/validateSchedule", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}",
                     },
-                    body: JSON.stringify({
-                        dp: dpAmount,
-                        nama_tim: document.querySelector('input[name="nama_tim"]').value,
-                        no_telepon: document.querySelector('input[name="no_telepon"]').value,
-                    }),
+                    body: JSON.stringify(formData),
                 })
                 .then(response => response.json())
                 .then(data => {
-                    snap.pay(data.snapToken, {
-                        onSuccess: function(result) {
-                            console.log("Success:", result);
-                            document.getElementById('bookingForm').submit();
-                        },
-                        onPending: function(result) {
-                            console.log("Pending:", result);
-                            alert("Menunggu pembayaran...");
-                        },
-                        onError: function(result) {
-                            console.log("Error:", result);
-                            alert("Pembayaran gagal! Cek console log untuk detail.");
-                        }
-                    });
+                    if (data.success) {
+                        // Jika validasi sukses, baru lanjutkan ke pembayaran Midtrans
+                        fetch("/pemesanan/getSnapToken", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                },
+                                body: JSON.stringify({
+                                    dp: formData.dp,
+                                    nama_tim: formData.nama_tim,
+                                    no_telepon: formData.no_telepon
+                                }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                snap.pay(data.snapToken, {
+                                    onSuccess: function(result) {
+                                        console.log("Success:", result);
+                                        document.getElementById('bookingForm').submit();
+                                    },
+                                    onPending: function(result) {
+                                        console.log("Pending:", result);
+                                        alert("Menunggu pembayaran...");
+                                    },
+                                    onError: function(result) {
+                                        console.log("Error:", result);
+                                        alert("Pembayaran gagal! Cek console log untuk detail.");
+                                    }
+                                });
+                            })
+                            .catch(error => console.error("Error:", error));
+                    } else {
+                        alert(data.message); // Tampilkan pesan error jika jadwal tidak tersedia
+                    }
                 })
                 .catch(error => console.error("Error:", error));
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</x-app-layout>
+@endsection

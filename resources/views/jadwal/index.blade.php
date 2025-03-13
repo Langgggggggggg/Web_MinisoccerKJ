@@ -1,10 +1,11 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Jadwal
-        </h2>
-    </x-slot>
-    <div class="container mt-11">
+@extends('layouts.app')
+
+@section('header')
+    @include('layouts.header')
+@endsection
+
+@section('content')
+    <div class="container">
         <div class="row mb-3">
             <div class="col-md-4">
                 <!-- Dropdown Pilih Bulan -->
@@ -205,4 +206,4 @@
             translateDates();
         });
     </script>
-</x-app-layout>
+@endsection

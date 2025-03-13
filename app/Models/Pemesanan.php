@@ -21,6 +21,8 @@ class Pemesanan extends Model
         'nama_tim',
         'no_telepon',
         'dp',
+        'status',
+        'sisa_bayar',
     ];
 
     // Relasi ke jadwal (One to One)
