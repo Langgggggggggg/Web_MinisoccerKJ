@@ -13,44 +13,39 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+     <!-- Font Awesome CDN -->
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/sidebar.js'])
+    @vite(['resources/js/lazyloading-sidebar.js'])
+    @vite(['resources/js/jadwal.js'])
 </head>
 
 <body class="font-sans antialiased bg-gray-100">
-    <div class="flex min-h-screen">
+    <main class="flex min-h-screen">
         <!-- Sidebar -->
-        @include('layouts.sidebar')
-        <div class="flex-1">
+        <aside class="md:flex md:flex-shrink-0">
+            @include('layouts.sidebar')
+        </aside>
+
+        <section class="flex-1">
             <!-- Page Header -->
-            @yield('header')
+            <header>
+                @yield('header')
+            </header>
 
             <!-- Page Content -->
-            <main class="p-10">
+            <section class="p-10">
                 @yield('content')
-            </main>
-        </div>
-    </div>
+            </section>
+        </section>
+    </main>
 </body>
-<script>
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const closeMenu = document.getElementById('close-menu');
-    const hamburgerIcon = document.getElementById('hamburger-icon');
-    const closeIcon = document.getElementById('close-icon');
-
-    menuToggle.addEventListener('click', function() {
-        sidebar.classList.remove('-translate-x-full');
-        hamburgerIcon.classList.add('hidden');
-        closeIcon.classList.remove('hidden');
-    });
-
-    closeMenu.addEventListener('click', function() {
-        sidebar.classList.add('-translate-x-full');
-        hamburgerIcon.classList.remove('hidden');
-        closeIcon.classList.add('hidden');
-    });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </html>

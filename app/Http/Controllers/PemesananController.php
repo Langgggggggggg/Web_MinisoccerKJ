@@ -32,19 +32,17 @@ class PemesananController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
-            'tanggal' => 'required|date',
-            'lapangan' => 'required|string',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
-            'nama_tim' => 'required|string|max:255',
-            'no_telepon' => 'required|string|max:15',
-            'dp' => 'required|numeric|min:100000',
-        ], [
-            'dp.min' => 'Jumlah DP minimal adalah 100.000!',
-            'dp.required' => 'DP wajib diisi!',
-            'dp.numeric' => 'DP harus berupa angka!',
-        ]);
+        $request->validate(
+            [
+                'tanggal' => 'required|date',
+                'lapangan' => 'required|string',
+                'jam_mulai' => 'required',
+                'jam_selesai' => 'required|after:jam_mulai',
+                'nama_tim' => 'required|string|max:255',
+                'no_telepon' => 'required|string|max:15',
+                'dp' => 'required|numeric|min:100000',
+            ],
+        );
 
         // Cari ID Jadwal berdasarkan tanggal, lapangan, dan jam yang dipilih
         $jadwals = Jadwal::where('tanggal', $request->tanggal)
@@ -53,7 +51,7 @@ class PemesananController extends Controller
             ->where('jam', '<', $request->jam_selesai) // Hanya hingga sebelum jam selesai
             ->get();
 
-        $kode_pemesanan = 'BOOK-' . strtoupper(uniqid());
+        $kode_pemesanan = strtoupper(substr(uniqid(), -5));
 
         DB::beginTransaction();
         try {
@@ -131,7 +129,7 @@ class PemesananController extends Controller
 
         return response()->json(['success' => true]);
     }
-    
+
     private function KirimNotifikasiWhatsApp(Pemesanan $pemesanan)
     {
         $phoneNumber = $pemesanan->no_telepon;
@@ -183,7 +181,7 @@ class PemesananController extends Controller
 
         $params = [
             'transaction_details' => [
-                'order_id' => 'BOOK-' . strtoupper(uniqid()), // Buat order ID unik
+                'order_id' => strtoupper(substr(uniqid(), -5)), // Buat order ID unik
                 'gross_amount' => (int) $request->dp, // Gunakan nilai DP sebagai gross_amount
             ],
             'customer_details' => [

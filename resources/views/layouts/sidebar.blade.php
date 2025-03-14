@@ -1,4 +1,4 @@
-<div class="relative md:flex">
+<nav class="relative md:flex">
     <!-- Hamburger Button (Tampil hanya saat sidebar tertutup) -->
     <!-- Tombol Hamburger -->
     <button id="menu-toggle" class="absolute top-0 left-2 z-50 text-black focus:outline-none md:hidden p-2">
@@ -30,16 +30,16 @@
         <nav class="mt-4">
             @if (Auth::user()->role === 'user')
                 <a href="{{ route('dashboard') }}"
-                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-emerald-600' : '' }}">
-                    Home
+                    class="sidebar-link block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-home w-5 h-5 mr-2"></i> Home
                 </a>
                 <a href="{{ route('jadwal.index') }}"
-                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
-                    Jadwal
+                    class="lazy-loading block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-calendar w-5 h-5 mr-2"></i> Jadwal
                 </a>
                 <a href="{{ route('pemesanan.detail') }}"
-                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('pemesanan.detail') ? 'bg-emerald-600' : '' }}">
-                    Detail Pemesanan
+                    class="sidebar-link block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('pemesanan.detail') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Detail Pemesanan
                 </a>
             @endif
 
@@ -51,5 +51,5 @@
             @endif
         </nav>
     </aside>
-</div>
+</nav>
 

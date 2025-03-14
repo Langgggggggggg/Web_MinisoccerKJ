@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+            <i class="fas fa-user-cog mr-2"></i> {{ __('Profile Information') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Perbarui informasi profil dan alamat email akun Anda.") }}
         </p>
     </header>
 
@@ -17,22 +17,33 @@
         @csrf
         @method('patch')
 
+        <!-- Name Input -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            {{-- <x-text-input id="username" name="username" type="text" class="mt-3 block w-full" :value="old('username', $user->username)" required autofocus autocomplete="username" /> --}}
+            <div class="flex items-center border border-gray-300 rounded-lg">
+                <i class="fas fa-user text-gray-400 mx-3"></i>
+                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full pl-10" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            </div>
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
+        <!-- Username Input -->
         <div>
             <x-input-label for="username" :value="__('Username')" />
-            <x-text-input id="username" name="username" type="text" class="mt-1 block w-full" :value="old('username', $user->username)" required autocomplete="username" />
+            <div class="flex items-center border border-gray-300 rounded-lg">
+                <i class="fas fa-user-tag text-gray-400 mx-3"></i>
+                <x-text-input id="username" name="username" type="text" class="mt-1 block w-full pl-10" :value="old('username', $user->username)" required autocomplete="username" />
+            </div>
             <x-input-error class="mt-2" :messages="$errors->get('username')" />
         </div>
         
+        <!-- Email Input -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <div class="flex items-center border border-gray-300 rounded-lg">
+                <i class="fas fa-envelope text-gray-400 mx-3"></i>
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full pl-10" :value="old('email', $user->email)" required autocomplete="username" />
+            </div>
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
@@ -54,8 +65,11 @@
             @endif
         </div>
 
+        <!-- Save Button -->
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>
+                <i class="fas fa-save mr-2"></i> {{ __('Save') }}
+            </x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p

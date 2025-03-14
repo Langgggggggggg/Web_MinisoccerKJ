@@ -1,27 +1,32 @@
-<header class="w-full bg-white shadow-md p-6 mb-4">
+<section class="w-full md:w-[42rem] lg:w-[42rem] xl:w-[72rem] md:mx-auto lg:mx-auto mt-5 bg-white shadow-md p-3">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-800">
             @php
                 if (request()->routeIs('dashboard')) {
-                    echo 'Home';
+                    echo '<i class="fas fa-home mr-2"></i> Home';
                 } elseif (request()->routeIs('jadwal.index')) {
-                    echo 'Jadwal';
+                    echo '<i class="fas fa-calendar-alt mr-2"></i> Jadwal';
                 } elseif (request()->routeIs('pemesanan.detail')) {
-                    echo 'Detail Pemesanan';
+                    echo '<i class="fas fa-file-alt mr-2"></i> Detail Pemesanan';
                 } elseif (request()->routeIs('admin.dashboard')) {
-                    echo 'Admin Dashboard';
+                    echo '<i class="fas fa-user-shield mr-2"></i> Admin Dashboard';
                 } elseif (request()->routeIs('profile.edit')) {
-                    echo 'Profile';
-                } else {
-                    echo 'Mini Soccer Kramat Jaya';
+                    echo '<i class="fas fa-user-edit mr-2"></i> Profile';
+                } else if (request()->routeIs('pemesanan.create')) {
+                    echo '<i class="fas fa-calendar-alt mr-2"></i>Form Pemesanan';
                 }
-        @endphp
+                    else {
+                    echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
+                }
+            @endphp
         </h1>
         <div class="relative">
             <details class="group">
                 <summary
                     class="flex items-center space-x-2 cursor-pointer px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 bg-white hover:text-gray-700">
-                    <span>{{ Auth::user()->name }}</span>
+                    <span><i class="fas fa-user mr-2"></i>
+                        {{ Auth::user()->name }}
+                    </span>
                     <svg class="w-4 h-4 transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -31,7 +36,9 @@
                 </summary>
                 <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                     <a href="{{ route('profile.edit') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                     Profile
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
@@ -43,4 +50,4 @@
             </details>
         </div>
     </div>
-</header>
+</section>
