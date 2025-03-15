@@ -19,6 +19,7 @@ class CreatePemesananTable extends Migration
         $table->string('nama_tim');
         $table->string('no_telepon', 15);
         $table->decimal('dp', 8, 0)->nullable();
+        $table->integer('harga'); 
         $table->enum('status', ['lunas', 'belum lunas'])->default('belum lunas');
         $table->integer('sisa_bayar')->default(0);
         $table->timestamps();

@@ -38,7 +38,7 @@
                     <i class="fas fa-calendar w-5 h-5 mr-2"></i> Jadwal
                 </a>
                 <a href="{{ route('pemesanan.detail') }}"
-                    class="sidebar-link block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('pemesanan.detail') ? 'bg-emerald-600' : '' }}">
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('pemesanan.detail') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Detail Pemesanan
                 </a>
             @endif
@@ -46,10 +46,30 @@
             @if (Auth::user()->role === 'admin')
                 <a href="{{ route('admin.dashboard') }}"
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600' : '' }}">
-                    Admin Dashboard
+                    <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Admin Dashboard
+                </a>
+
+                <!-- Dropdown Data -->
+                <div x-data="{ open: {{ request()->routeIs('admin.data-pemesanan') ? 'true' : 'false' }} }">
+                    <button @click="open = !open"
+                        class="flex items-center justify-between w-full rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white">
+                        <span><i class="fas fa-database w-5 h-5 mr-2"></i> Master Data</span>
+                        <i class="fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+                    </button>
+
+                    <div x-show="open" class="pl-8 mt-2">
+                        <a href="{{ route('admin.data-pemesanan') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.data-pemesanan') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Data Pemesanan
+                        </a>
+                    </div>
+                </div>
+
+                <a href="{{ route('admin.konfirmasi-pelunasan') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.konfirmasi-pelunasan') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-money-check-alt w-5 h-5 mr-2"></i> Konfirmasi Pelunasan
                 </a>
             @endif
         </nav>
     </aside>
 </nav>
-

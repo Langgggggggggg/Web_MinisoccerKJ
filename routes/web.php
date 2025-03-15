@@ -32,5 +32,15 @@ Route::middleware('auth')->group(function () {
 //untuk admin 
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    // Rute untuk menampilkan halaman konfirmasi pelunasan
+    Route::get('/admin/konfirmasi-pelunasan', function () {
+        return view('admin.konfirmasi-pelunasan');
+    })->name('admin.konfirmasi-pelunasan');
+
+    // Rute untuk memproses konfirmasi pelunasan
+    Route::post('/admin/konfirmasi-pelunasan', [AdminController::class, 'konfirmasiPelunasan'])->name('admin.konfirmasi-pelunasan');
+    Route::get('/admin/pemesanan', [AdminController::class, 'dataPemesanan'])->name('admin.data-pemesanan');
+
 });
+
 require __DIR__ . '/auth.php';

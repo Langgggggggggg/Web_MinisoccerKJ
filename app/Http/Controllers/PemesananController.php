@@ -90,6 +90,7 @@ class PemesananController extends Controller
                         'nama_tim' => $request->nama_tim,
                         'no_telepon' => $request->no_telepon,
                         'dp' => $index === 0 ? $request->dp : null,
+                        'harga' => $total_harga,
                         'sisa_bayar' => $sisa_bayar,
                         'status' => $status,
                     ]);

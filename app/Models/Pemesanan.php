@@ -21,6 +21,7 @@ class Pemesanan extends Model
         'nama_tim',
         'no_telepon',
         'dp',
+        'harga',
         'status',
         'sisa_bayar',
     ];

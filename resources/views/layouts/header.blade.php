@@ -12,10 +12,13 @@
                     echo '<i class="fas fa-user-shield mr-2"></i> Admin Dashboard';
                 } elseif (request()->routeIs('profile.edit')) {
                     echo '<i class="fas fa-user-edit mr-2"></i> Profile';
-                } else if (request()->routeIs('pemesanan.create')) {
+                } elseif (request()->routeIs('pemesanan.create')) {
                     echo '<i class="fas fa-calendar-alt mr-2"></i>Form Pemesanan';
-                }
-                    else {
+                } elseif (request()->routeIs('admin.data-pemesanan')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i>Data Pemesanan';
+                } elseif (request()->routeIs('admin.konfirmasi-pelunasan')) {
+                    echo '<i class="fas fa-money-check-alt mr-2"></i>Konfirmasi Pelunasan';
+                } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }
             @endphp
@@ -37,7 +40,7 @@
                 <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                     <a href="{{ route('profile.edit') }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                     Profile
+                        Profile
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
