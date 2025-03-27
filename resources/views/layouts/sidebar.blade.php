@@ -41,6 +41,10 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('pemesanan.detail') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Detail Pemesanan
                 </a>
+                <a href="{{ route('reward.index') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('reward.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-gift w-5 h-5 mr-2"></i> Reward Point
+                </a>
             @endif
 
             @if (Auth::user()->role === 'admin')
@@ -50,7 +54,7 @@
                 </a>
 
                 <!-- Dropdown Data -->
-                <div x-data="{ open: {{ request()->routeIs('admin.data-pemesanan') ? 'true' : 'false' }} }">
+                <div x-data="{ open: {{ request()->routeIs('admin.data-pemesanan') || request()->routeIs('admin.reward-points') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                         class="flex items-center justify-between w-full rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white">
                         <span><i class="fas fa-database w-5 h-5 mr-2"></i> Master Data</span>
@@ -62,14 +66,34 @@
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.data-pemesanan') ? 'bg-emerald-600' : '' }}">
                             <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Data Pemesanan
                         </a>
+                        <a href="{{ route('admin.reward-points') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.reward-points') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-gift w-5 h-5 mr-2"></i> Data Reward Points
+                        </a>
                     </div>
                 </div>
 
-                <a href="{{ route('admin.konfirmasi-pelunasan') }}"
-                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.konfirmasi-pelunasan') ? 'bg-emerald-600' : '' }}">
-                    <i class="fas fa-money-check-alt w-5 h-5 mr-2"></i> Konfirmasi Pelunasan
-                </a>
+                <!-- Dropdown Konfirmasi/Transaksi -->
+                <div x-data="{ open: {{ request()->routeIs('admin.konfirmasi-pelunasan') || request()->routeIs('admin.konfirmasi-penukaran-poin') ? 'true' : 'false' }} }">
+                    <button @click="open = !open"
+                        class="flex items-center justify-between w-full rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white">
+                        <span><i class="fas fa-check-circle w-5 h-5 mr-2"></i> Konfirmasi</span>
+                        <i class="fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+                    </button>
+
+                    <div x-show="open" class="pl-8 mt-2">
+                        <a href="{{ route('admin.konfirmasi-pelunasan') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.konfirmasi-pelunasan') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-money-check-alt w-5 h-5 mr-2"></i> Konfirmasi Pelunasan
+                        </a>
+                        <a href="{{ route('admin.konfirmasi-penukaran-poin') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.konfirmasi-penukaran-poin') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-gift w-5 h-5 mr-2"></i> Konfirmasi Penukaran Poin
+                        </a>
+                    </div>
+                </div>
             @endif
+
         </nav>
     </aside>
 </nav>

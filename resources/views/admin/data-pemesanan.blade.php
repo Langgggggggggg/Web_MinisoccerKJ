@@ -5,37 +5,42 @@
 @endsection
 
 @section('content')
-    <div class="w-[27rem] md:w-full xl:w-full">
+    <div class="w-[20rem] md:w-full lg:w-full xl:w-full">
 
-        <div class="flex gap-4 justify-between">
-            <!-- Search Bar -->
+        <div class="md:flex md:gap-4 md:justify-between grid grid-cols-1">
             <!-- Form Pencarian -->
-            <form method="GET" action="{{ route('admin.data-pemesanan') }}" class="flex flex-wrap gap-4 mb-3">
-                <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Cari Nama Tim atau Kode Pemesanan" class="px-4 py-2 border rounded-md w-full sm:w-72 h-auto">
-                <button type="submit" class="px-4 py-2 bg-emerald-500 text-white rounded-md w-full sm:w-auto h-auto">
-                    <i class="fas fa-search mr-2"></i> Cari
-                </button>
+            <form method="GET" action="{{ route('admin.data-pemesanan') }}" class="flex mb-3">
+                <div class="relative w-96">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari " class="px-4 py-2 border rounded-md w-full h-auto">
+                    <button type="submit"
+                        class="absolute right-0 top-0 px-4  bg-emerald-500 text-white rounded-md h-8 mt-1">
+                        <i class="fas fa-search mr-2"></i>
+                    </button>
+                </div>
             </form>
 
-            <!-- Filter Data -->
-            <form method="GET" action="{{ route('admin.data-pemesanan') }}" class="flex flex-wrap gap-4 mb-3">
+            <!-- Form Filter Data -->
+            <form method="GET" action="{{ route('admin.data-pemesanan') }}"
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-3">
+                <!-- Input Tanggal -->
                 <input type="date" name="tanggal" value="{{ request('tanggal') }}"
-                    class="px-4 py-2 border rounded-md w-full sm:w-auto">
-                <select name="status" class="px-4 py-2 border rounded-md w-full sm:w-auto">
+                    class="px-4 py-2 border rounded-md w-full">
+
+                <!-- Select Status -->
+                <select name="status" class="px-4 py-2 border rounded-md w-full">
                     <option value="">Pilih Status</option>
                     <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>Lunas</option>
                     <option value="belum lunas" {{ request('status') == 'belum lunas' ? 'selected' : '' }}>Belum Lunas
                     </option>
                 </select>
+
+                <!-- Button Filter -->
                 <button type="submit" class="px-4 py-2 bg-emerald-500 text-white rounded-md w-full sm:w-auto">
                     <i class="fas fa-filter mr-2"></i> Filter
                 </button>
-                {{-- <a href="{{ route('admin.data-pemesanan') }}"
-                class="px-4 py-2 bg-gray-500 text-white rounded-md w-full sm:w-auto">
-                <i class="fas fa-sync-alt mr-2"></i> Reset
-            </a> --}}
             </form>
+
         </div>
         <!-- Tabel Data Pemesanan -->
         <div class="max-w-full overflow-x-auto bg-white rounded-lg shadow-md">

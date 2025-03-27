@@ -18,6 +18,12 @@
                     echo '<i class="fas fa-file-alt mr-2"></i>Data Pemesanan';
                 } elseif (request()->routeIs('admin.konfirmasi-pelunasan')) {
                     echo '<i class="fas fa-money-check-alt mr-2"></i>Konfirmasi Pelunasan';
+                } elseif (request()->routeIs('admin.reward-points')) {
+                    echo '<i class="fas fa-gift mr-2"></i>Perolehan Reward Points';
+                } elseif (request()->routeIs('reward.index')) {
+                    echo '<i class="fas fa-gift mr-2"></i>Reward Point';
+                } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
+                    echo '<i class="fas fa-gift mr-2"></i>Penukaran Poin';
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }
