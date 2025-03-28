@@ -32,7 +32,7 @@ class AdminController extends Controller
         $pemesanan = Pemesanan::where('kode_pemesanan', $request->kode_pemesanan)->first();
 
         if ($pemesanan) {
-            if ($pemesanan->status == "Lunas") {
+            if ($pemesanan->status == "lunas") {
                 return redirect()->route('admin.konfirmasi-pelunasan')->with('error', 'Kode pemesanan sudah digunakan (Lunas).');
             }
 

@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/reward-points', [RewardPointController::class, 'index'])->name('reward.index');
+    Route::get('/reward-points/invoice/{id}', [RewardPointController::class, 'invoice'])->name('reward.invoice');
+    Route::get('/reward-points/{id}/invoice', [RewardPointController::class, 'downloadInvoice'])->name('reward.download-invoice');
 });
 
 
@@ -49,10 +51,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     // Rute untuk memproses konfirmasi pelunasan dan reward point
     Route::post('/admin/konfirmasi-pelunasan', [AdminController::class, 'konfirmasiPelunasan'])->name('admin.konfirmasi-pelunasan');
     Route::get('/admin/pemesanan', [AdminController::class, 'dataPemesanan'])->name('admin.data-pemesanan');
-    Route::get('/admin/konfirmasi-penukaran-poin', [AdminController::class, 'showKonfirmasiPenukaranPoin'])->name('admin.konfirmasi-penukaran-poin');
-    Route::post('/admin/konfirmasi-penukaran-poin', [AdminController::class, 'konfirmasiPenukaranPoin'])->name('admin.konfirmasi-penukaran-poin.submit');
     
     Route::get('/admin/reward-points', [AdminController::class, 'dataRewardPoint'])->name('admin.reward-points');
+    Route::get('/admin/konfirmasi-penukaran-poin', [AdminController::class, 'showKonfirmasiPenukaranPoin'])->name('admin.konfirmasi-penukaran-poin');
+    Route::post('/admin/konfirmasi-penukaran-poin', [AdminController::class, 'konfirmasiPenukaranPoin'])->name('admin.konfirmasi-penukaran-poin.submit');
 });
 
 
