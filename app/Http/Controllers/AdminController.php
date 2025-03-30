@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Pemesanan;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use App\Models\RewardPoint;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
@@ -23,6 +27,89 @@ class AdminController extends Controller
         // Mengirim data ke view
         return view('admin.dashboard', compact('totalUsers', 'totalAdmin', 'totalBelumLunas'));
     }
+    public function dataAdmin()
+    {
+        // Mengambil data pengguna dengan role admin
+        $admins = User::where('role', 'admin')->paginate(10);
+
+        return view('admin.data-admin', compact('admins'));
+    }
+    public function dataUser()
+    {
+        // Mengambil data pengguna dengan role admin
+        $users = User::where('role', 'user')->paginate(10);
+
+        return view('user.data-user', compact('users'));
+    }
+
+    // Menampilkan halaman tambah admin
+    public function createAdmin()
+    {
+        return view('admin.tambah-admin');
+    }
+    public function edit($id)
+    {
+        $admin = Auth::user();
+    
+        if ($admin->id != $id) {
+            return redirect()->route('admin.data-admin')->with('error', 'Anda tidak memiliki izin untuk mengedit admin lain.');
+        }   
+    
+        return view('admin.edit', compact('admin'));
+    }
+    
+    public function update(Request $request, $id)
+    {
+        $admin = User::findOrFail($id); // Ambil admin berdasarkan ID
+    
+        if (Auth::id() != $admin->id) { // Pastikan yang login hanya bisa edit dirinya sendiri
+            return redirect()->route('admin.data-admin')->with('error', 'Anda tidak memiliki izin untuk mengedit admin lain.');
+        }
+    
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+    
+        // Update data admin
+        $admin->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => $request->password ? Hash::make($request->password) : $admin->password,
+        ]);
+    
+        return redirect()->route('admin.data-admin')->with('success', 'Data admin berhasil diperbarui.');
+    }
+    
+    // Menyimpan admin baru
+    public function storeAdmin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Simpan admin baru ke database
+        User::create([
+            'name' => $request->name,
+            'username' => $request->username, // Menambahkan username
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'admin' // Pastikan ada kolom 'role' di tabel users
+        ]);
+
+        return redirect()->route('admin.data-admin')->with('success', 'Admin baru berhasil ditambahkan.');
+    }
+
     public function konfirmasiPelunasan(Request $request)
     {
         $request->validate([
@@ -110,7 +197,7 @@ class AdminController extends Controller
     {
         return view('admin.konfirmasi-penukaran-poin');
     }
-    
+
     public function dataPemesanan(Request $request)
     {
         $query = Pemesanan::query();

@@ -24,6 +24,14 @@
                     echo '<i class="fas fa-gift mr-2"></i>Reward Point';
                 } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
                     echo '<i class="fas fa-gift mr-2"></i>Penukaran Poin';
+                } elseif (request()->routeIs('admin.data-admin')) {
+                    echo '<i class="fas fa-user-cog mr-2"></i>Data Admin';
+                } elseif (request()->routeIs('user.data-user')) {
+                    echo '<i class="fas fa-user mr-2"></i>Data User';
+                } elseif (request()->routeIs('admin.edit')) {
+                    echo '<i class="fas fa-user-edit mr-2"></i>Edit Profil Admin';
+                } elseif (request()->routeIs('admin.create')) {
+                    echo '<i class="fas fa-user-plus mr-2"></i>Tambah Admin';
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }

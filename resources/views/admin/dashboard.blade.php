@@ -17,7 +17,7 @@
                     </div>
                     <i class="fas fa-users text-4xl mr-4"></i>
                 </div>
-                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                <a href="{{ route('user.data-user') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat data <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
@@ -33,7 +33,7 @@
                     </div>
                     <i class="fas fa-user-shield text-4xl mr-4"></i>
                 </div>
-                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                <a href="{{ route('admin.data-admin') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat data <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
