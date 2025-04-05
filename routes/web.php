@@ -29,6 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan/store', [PemesananController::class, 'store'])->name('pemesanan.store');
     Route::get('/pemesanan/detail', [PemesananController::class, 'index'])->name('pemesanan.detail');
+    Route::get('/pemesanan/{kode_pemesanan}/edit', [PemesananController::class, 'edit'])->name('pemesanan.edit');
+    Route::put('/pemesanan/{kode_pemesanan}', [PemesananController::class, 'update'])->name('pemesanan.update');
     Route::post('/pemesanan/validateSchedule', [PemesananController::class, 'validateSchedule']);
     Route::post('/pemesanan/getSnapToken', [PemesananController::class, 'getSnapToken'])->name('pemesanan.getSnapToken');
 });

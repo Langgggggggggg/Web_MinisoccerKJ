@@ -59,17 +59,38 @@ class PemesananController extends Controller
                 // Hitung durasi bermain dalam jam
                 $durasi = (strtotime($request->jam_selesai) - strtotime($request->jam_mulai)) / 3600;
 
-                // Tentukan harga berdasarkan lapangan dan waktu
-                if ($jadwal->lapangan >= 1 && $jadwal->lapangan <= 3) {
-                    $harga_per_jam = ($request->jam_mulai >= '07:00' && $request->jam_mulai < '17:00') ? 300000 : 350000;
-                } elseif ($jadwal->lapangan >= 4 && $jadwal->lapangan <= 5) {
-                    $harga_per_jam = ($request->jam_mulai >= '07:00' && $request->jam_mulai < '17:00') ? 400000 : 450000;
-                } else {
-                    $harga_per_jam = 0; // Jaga-jaga jika ada input tidak valid
-                }
+                // Inisialisasi total harga
+                $total_harga = 0;
 
-                // Hitung total harga lapangan
-                $total_harga = $harga_per_jam * $durasi;
+                // Waktu mulai dalam format timestamp
+                $jam_mulai = strtotime($request->jam_mulai);
+
+                // Loop setiap jam
+                for ($i = 0; $i < $durasi; $i++) {
+                    // Jam saat ini dalam loop
+                    $current_time = strtotime("+$i hour", $jam_mulai);
+                    $current_hour = date('H:i', $current_time);
+
+                    // Tentukan harga berdasarkan lapangan dan jam sekarang
+                    if ($request->lapangan >= 1 && $request->lapangan <= 3) {
+                        if ($current_hour >= '07:00' && $current_hour < '17:00') {
+                            $harga_per_jam = 300000;
+                        } else {
+                            $harga_per_jam = 350000;
+                        }
+                    } elseif ($request->lapangan >= 4 && $request->lapangan <= 5) {
+                        if ($current_hour >= '07:00' && $current_hour < '17:00') {
+                            $harga_per_jam = 400000;
+                        } else {
+                            $harga_per_jam = 450000;
+                        }
+                    } else {
+                        $harga_per_jam = 0;
+                    }
+
+                    // Tambahkan ke total
+                    $total_harga += $harga_per_jam;
+                }
 
                 // Hitung sisa bayar
                 $dp = $index === 0 ? $request->dp : 0; // Hanya jam pertama yang memiliki DP
@@ -104,6 +125,98 @@ class PemesananController extends Controller
 
             DB::commit();
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+    // Method edit
+    public function edit($kode_pemesanan)
+    {
+        $pemesanan = Pemesanan::where('kode_pemesanan', $kode_pemesanan)->firstOrFail();
+        $jadwals = Jadwal::orderBy('tanggal')->orderBy('jam')->get();
+
+        return view('pemesanan.edit', compact('pemesanan', 'jadwals'));
+    }
+
+    // Method update
+    public function update(Request $request, $kode_pemesanan)
+    {
+        $request->validate([
+            'tanggal' => 'required|date',
+            'lapangan' => 'required|string',
+            'jam_mulai' => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
+        ]);
+
+        $pemesanan = Pemesanan::where('kode_pemesanan', $kode_pemesanan)->firstOrFail();
+
+        // Validasi H-1: Perubahan hanya diperbolehkan jika hari ini lebih dari H-1 sebelum tanggal bermain
+        $tanggal_main = Carbon::parse($pemesanan->tanggal);
+        $hari_ini = Carbon::now();
+
+        if ($hari_ini->diffInDays($tanggal_main, false) < 1) {
+            return back()->withErrors(['error' => 'Jadwal tidak dapat diubah karena hari ini mendekati tanggal bermain.']);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update data jadwal
+            $jadwals = Jadwal::where('tanggal', $request->tanggal)
+                ->where('lapangan', $request->lapangan)
+                ->where('jam', '>=', $request->jam_mulai)
+                ->where('jam', '<', $request->jam_selesai)
+                ->get();
+
+            if ($jadwals->isEmpty()) {
+                return back()->withErrors(['error' => 'Jadwal yang dipilih tidak tersedia.']);
+            }
+
+            $total_harga = 0;
+
+            foreach ($jadwals as $jadwal) {
+                $jam = $jadwal->jam;
+    
+                // Tentukan harga per jam berdasarkan waktu dan lapangan
+                if ($jadwal->lapangan >= 1 && $jadwal->lapangan <= 3) {
+                    if ($jam >= '07:00' && $jam < '17:00') {
+                        $harga_per_jam = 300000;
+                    } elseif ($jam >= '17:00' && $jam <= '23:00') {
+                        $harga_per_jam = 350000;
+                    } else {
+                        $harga_per_jam = 0;
+                    }
+                } elseif ($jadwal->lapangan >= 4 && $jadwal->lapangan <= 5) {
+                    if ($jam >= '07:00' && $jam < '17:00') {
+                        $harga_per_jam = 400000;
+                    } elseif ($jam >= '17:00' && $jam <= '23:00') {
+                        $harga_per_jam = 450000;
+                    } else {
+                        $harga_per_jam = 0;
+                    }
+                } else {
+                    $harga_per_jam = 0;
+                }
+    
+                $total_harga += $harga_per_jam;
+
+                // Calculate remaining payment (sisa bayar)
+                $sisa_bayar = max(0, $total_harga - $pemesanan->dp);
+
+                $jadwal->update(['status' => 'booked']); // Optional, update status jadwal jika perlu
+
+                $pemesanan->update([
+                    'tanggal' => $request->tanggal,
+                    'jam_mulai' => $request->jam_mulai,
+                    'jam_selesai' => $request->jam_selesai,
+                    'jadwal_id' => $jadwal->id,
+                    'harga' => $total_harga,
+                    'sisa_bayar' => $sisa_bayar,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pemesanan.detail')->with('success', 'Jadwal berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);

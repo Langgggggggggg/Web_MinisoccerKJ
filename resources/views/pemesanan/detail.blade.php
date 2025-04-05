@@ -6,25 +6,25 @@
 
 @section('content')
     <div class="w-[27rem] md:w-full xl:w-full">
-        <div class="max-w-full overflow-x-auto bg-white rounded-lg shadow-md">
+        <div class="lg:w-[75rem] max-w-full overflow-x-auto bg-white rounded-lg shadow-md">
             <div class="flex flex-col md:flex-row justify-between items-center border-b border-gray-200 p-2 gap-2">
                 <div class="flex space-x-2">
                     <button id="tabBelumLunas"
                         class="tab-button px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-md hover:bg-gray-200"
-                        onclick="showTab('belumLunas')">
+                        data-status="belumLunas">
                         Belum Lunas
                     </button>
                     <button id="tabLunas"
                         class="tab-button px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-md hover:bg-gray-200"
-                        onclick="showTab('lunas')">
+                        data-status="lunas">
                         Riwayat Pemesanan
                     </button>
                 </div>
-            
+
                 <input type="text" id="searchInput" placeholder="Cari.."
                     class="p-2 border rounded-md text-sm w-full md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
             </div>
-            
+
             <table class="table-auto w-full text-center text-sm text-gray-700">
                 <thead class="bg-emerald-600">
                     <tr class="text-white">
@@ -38,6 +38,8 @@
                         <th class="px-4 py-2 border-b">Harga Lapang</th>
                         <th class="px-4 py-2 border-b">Sisa Bayar</th>
                         <th class="px-4 py-2 border-b">Status</th>
+                        <th class="px-4 py-2 border-b" id="aksiHeader" style="display: none;">Aksi</th>
+
                     </tr>
                 </thead>
                 <tbody id="tableContent" class="hidden">
@@ -65,9 +67,18 @@
                                         Rp{{ number_format($pesan->sisa_bayar, 0, ',', '.') }}</td>
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">
                                         <span
-                                            class="badge {{ $pesan->status == 'lunas' ? 'bg-green-500' : 'bg-yellow-500' }} text-white py-1 px-2 rounded-md">
+                                            class="inline-block text-xs md:text-sm font-medium {{ $pesan->status == 'lunas' ? 'bg-green-500' : 'bg-yellow-500' }} text-white px-3 py-1 rounded-md shadow whitespace-nowrap">
                                             {{ ucfirst($pesan->status) }}
                                         </span>
+                                    </td>
+
+                                    <td class="px-4 py-2 border-b aksiColumn" id="aksiColumn" style="display: none;">
+                                        @if ($pesan->status == 'belum lunas' && $loop->first)
+                                            <a href="{{ route('pemesanan.edit', $pesan->kode_pemesanan) }}"
+                                                class="inline-block bg-green-700 hover:bg-green-600 text-white text-xs md:text-sm font-medium px-3 py-1 rounded-md shadow transition duration-200 text-center whitespace-nowrap">
+                                                Ubah Jadwal
+                                            </a>
+                                        @endif
                                     </td>
                                 @endif
                             </tr>
@@ -85,108 +96,26 @@
             </table>
         </div>
     </div>
-     <!-- Sweet Alert CDN -->
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Sweet Alert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-     @if (session('success'))
-         <script>
-             Swal.fire({
-                 icon: 'success',
-                 title: 'Berhasil!',
-                 text: "{{ session('success') }}"
-             });
-         </script>
-     @endif
- 
-     @if (session('error'))
-         <script>
-             Swal.fire({
-                 icon: 'error',
-                 title: 'Gagal!',
-                 text: "{{ session('error') }}"
-             });
-         </script>
-     @endif
-    <script>
-        function showTab(status) {
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('bg-emerald-500', 'text-white');
-                button.classList.add('bg-gray-100', 'text-gray-600');
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}"
             });
+        </script>
+    @endif
 
-            document.getElementById('tab' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add(
-                'bg-emerald-500', 'text-white');
-            document.getElementById('tab' + status.charAt(0).toUpperCase() + status.slice(1)).classList.remove(
-                'bg-gray-100', 'text-gray-600');
-
-            document.querySelectorAll('tbody tr').forEach(row => {
-                row.style.display = 'none';
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}"
             });
-            document.querySelectorAll('.' + status).forEach(row => {
-                row.style.display = '';
-            });
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById('tableContent').classList.remove(
-                'hidden'); // Tampilkan tabel setelah JS dijalankan
-            showTab('belumLunas');
-        });
-        document.getElementById("searchInput").addEventListener("input", function() {
-            let searchValue = this.value.toLowerCase().trim();
-            let allRows = document.querySelectorAll("tbody tr");
-
-            // Menentukan tab yang sedang aktif
-            let activeTab = document.querySelector(".tab.active");
-            let activeTabId = activeTab ? activeTab.id : "tabBelumLunas";
-            let activeStatus = activeTabId === "tabLunas" ? "lunas" : "belumLunas";
-
-            let foundInBelumLunas = false;
-            let foundInLunas = false;
-
-            allRows.forEach(row => {
-                let kodePemesanan = row.cells[0]?.innerText.toLowerCase();
-                let namaTim = row.cells[1]?.innerText.toLowerCase();
-                let status = row.classList.contains("lunas") ? "lunas" : "belumLunas";
-
-                if (kodePemesanan.includes(searchValue) || namaTim.includes(searchValue)) {
-                    if (status === "lunas") {
-                        foundInLunas = true;
-                    } else {
-                        foundInBelumLunas = true;
-                    }
-                }
-            });
-
-            // Jika input kosong, tampilkan tab "Belum Lunas" dan hanya data yang sesuai
-            if (searchValue === "") {
-                showTab("belumLunas"); // Pindah ke tab "Belum Lunas"
-                allRows.forEach(row => {
-                    let status = row.classList.contains("lunas") ? "lunas" : "belumLunas";
-                    row.style.display = (status === "belumLunas") ? "" : "none";
-                });
-                return;
-            }
-
-            // Menentukan tab berdasarkan hasil pencarian
-            if (foundInLunas) {
-                showTab("lunas");
-            } else if (foundInBelumLunas) {
-                showTab("belumLunas");
-            }
-
-            allRows.forEach(row => {
-                let kodePemesanan = row.cells[0]?.innerText.toLowerCase();
-                let namaTim = row.cells[1]?.innerText.toLowerCase();
-                let status = row.classList.contains("lunas") ? "lunas" : "belumLunas";
-
-                if ((kodePemesanan.includes(searchValue) || namaTim.includes(searchValue)) &&
-                    ((foundInLunas && status === "lunas") || (foundInBelumLunas && status === "belumLunas"))
-                    ) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        });
-    </script>
+        </script>
+    @endif
 @endsection
