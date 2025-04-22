@@ -59,10 +59,16 @@
                     class="btn btn-primary mt-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600">
                     Tampilkan Jadwal
                 </button>
-                <a href="{{ route('pemesanan.create') }}"
-                    class="btn btn-success mt-4 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600">
-                    Tambah Pesanan
-                </a>
+                @if (Auth::user()->role === 'admin')
+                    <a href="{{ route('admin.pemesanan.create') }}" class="btn btn-success mt-4 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        Tambah Pesanan (Admin)
+                    </a>
+                @else
+                    <a href="{{ route('pemesanan.create') }}"
+                        class="btn btn-success mt-4 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        Tambah Pesanan
+                    </a>
+                @endif
             </div>
         </div>
 

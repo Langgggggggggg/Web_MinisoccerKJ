@@ -52,7 +52,10 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Admin Dashboard
                 </a>
-
+                <a href="{{ route('jadwal.index') }}"
+                    class="lazy-loading block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-calendar w-5 h-5 mr-2"></i> Jadwal
+                </a>
                 <!-- Dropdown Data -->
                 <div x-data="{ open: {{ request()->routeIs('admin.data-pemesanan') || request()->routeIs('admin.reward-points') ? 'true' : 'false' }} }">
                     <button @click="open = !open"

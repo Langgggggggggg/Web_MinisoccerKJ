@@ -2,40 +2,50 @@
     <div class="max-w-6xl mx-auto flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-800">
             @php
+                // Bagian Pemesanan / User
                 if (request()->routeIs('dashboard')) {
                     echo '<i class="fas fa-home mr-2"></i> Home';
                 } elseif (request()->routeIs('jadwal.index')) {
                     echo '<i class="fas fa-calendar-alt mr-2"></i> Jadwal';
                 } elseif (request()->routeIs('pemesanan.detail')) {
                     echo '<i class="fas fa-file-alt mr-2"></i> Detail Pemesanan';
-                } elseif (request()->routeIs('admin.dashboard')) {
-                    echo '<i class="fas fa-user-shield mr-2"></i> Admin Dashboard';
+                } elseif (request()->routeIs('pemesanan.create')) {
+                    echo '<i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan';
+                } elseif (request()->routeIs('pemesanan.edit')) {
+                    echo '<i class="fas fa-edit mr-2"></i> Ubah Jadwal Pemesanan';
                 } elseif (request()->routeIs('profile.edit')) {
                     echo '<i class="fas fa-user-edit mr-2"></i> Profile';
-                } elseif (request()->routeIs('pemesanan.create')) {
-                    echo '<i class="fas fa-calendar-alt mr-2"></i>Form Pemesanan';
-                } elseif (request()->routeIs('admin.data-pemesanan')) {
-                    echo '<i class="fas fa-file-alt mr-2"></i>Data Pemesanan';
-                } elseif (request()->routeIs('admin.konfirmasi-pelunasan')) {
-                    echo '<i class="fas fa-money-check-alt mr-2"></i>Konfirmasi Pelunasan';
-                } elseif (request()->routeIs('admin.reward-points')) {
-                    echo '<i class="fas fa-gift mr-2"></i>Perolehan Reward Points';
                 } elseif (request()->routeIs('reward.index')) {
-                    echo '<i class="fas fa-gift mr-2"></i>Reward Point';
-                } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
-                    echo '<i class="fas fa-gift mr-2"></i>Penukaran Poin';
-                } elseif (request()->routeIs('admin.data-admin')) {
-                    echo '<i class="fas fa-user-cog mr-2"></i>Data Admin';
+                    echo '<i class="fas fa-gift mr-2"></i> Reward Point';
                 } elseif (request()->routeIs('user.data-user')) {
-                    echo '<i class="fas fa-user mr-2"></i>Data User';
+                    echo '<i class="fas fa-user mr-2"></i> Data User';
+
+                    // Bagian Admin
+                } elseif (request()->routeIs('admin.dashboard')) {
+                    echo '<i class="fas fa-user-shield mr-2"></i> Admin Dashboard';
+                } elseif (request()->routeIs('admin.data-pemesanan')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i> Data Pemesanan';
+                } elseif (request()->routeIs('admin.konfirmasi-pelunasan')) {
+                    echo '<i class="fas fa-money-check-alt mr-2"></i> Konfirmasi Pelunasan';
+                } elseif (request()->routeIs('admin.reward-points')) {
+                    echo '<i class="fas fa-gift mr-2"></i> Perolehan Reward Points';
+                } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
+                    echo '<i class="fas fa-gift mr-2"></i> Penukaran Poin';
+                } elseif (request()->routeIs('admin.data-admin')) {
+                    echo '<i class="fas fa-user-cog mr-2"></i> Data Admin';
                 } elseif (request()->routeIs('admin.edit')) {
-                    echo '<i class="fas fa-user-edit mr-2"></i>Edit Profil Admin';
+                    echo '<i class="fas fa-user-edit mr-2"></i> Edit Profil Admin';
                 } elseif (request()->routeIs('admin.create')) {
-                    echo '<i class="fas fa-user-plus mr-2"></i>Tambah Admin';
+                    echo '<i class="fas fa-user-plus mr-2"></i> Tambah Admin';
+                } elseif (request()->routeIs('admin.editPemesanan')) {
+                    echo '<i class="fas fa-edit mr-2"></i> Ubah Jadwal Pemesanan';
+
+                    // Default jika tidak sesuai rute manapun
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }
             @endphp
+
         </h1>
         <div class="relative">
             <details class="group">

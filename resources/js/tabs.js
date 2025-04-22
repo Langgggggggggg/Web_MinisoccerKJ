@@ -34,22 +34,27 @@ function showTab(status) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById('tableContent').classList.remove(
-    'hidden'); // Tampilkan tabel setelah JS dijalankan
-    showTab('belumLunas'); // Set default tab "Belum Lunas"
+document.addEventListener("DOMContentLoaded", () => {
+    const tableContent = document.getElementById('tableContent');
 
-    // Tambahkan event listener untuk semua tombol tab
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const status = this.getAttribute('data-status');
-            showTab(status);
+    if (tableContent) {
+        tableContent.classList.remove('hidden');
+        showTab('belumLunas');
+
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', event => {
+                const status = event.target.getAttribute('data-status');
+                showTab(status);
+            });
         });
-    });
+    }
 });
 
+
 // Fungsi pencarian
-document.getElementById("searchInput").addEventListener("input", function() {
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+    searchInput.addEventListener("input", function() {
     let searchValue = this.value.toLowerCase().trim();
     let allRows = document.querySelectorAll("tbody tr");
 
@@ -108,3 +113,4 @@ document.getElementById("searchInput").addEventListener("input", function() {
         }
     });
 });
+}

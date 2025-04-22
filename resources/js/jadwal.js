@@ -78,10 +78,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Event Listener
-    monthSelector.addEventListener("change", filterDatesByMonth);
-    showScheduleButton.addEventListener("click", showSelectedTable);
+    if (monthSelector) {
+        monthSelector.addEventListener("change", filterDatesByMonth);
+    }
+
+    if (showScheduleButton) {
+        showScheduleButton.addEventListener("click", showSelectedTable);
+    }
 
     // **Panggil fungsi saat halaman pertama kali dimuat**
-    filterDatesByMonth();
+    if (monthSelector) {
+        filterDatesByMonth();
+    }
+
     translateDates();
 });
