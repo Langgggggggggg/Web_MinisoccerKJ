@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\RewardPoint;
+use Carbon\Carbon;
+use App\Helpers\NotifikasiHelper;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -23,8 +25,10 @@ class AdminController extends Controller
         // Menghitung total admin (hanya pengguna dengan role 'admin')
         $totalAdmin = User::where('role', 'admin')->count();
 
-        // Menghitung total pemesanan dengan status "belum lunas"
-        $totalBelumLunas = Pemesanan::where('status', 'belum lunas')->count();
+        // Menghitung total pemesanan dengan status "belum lunas" (hanya yang berlangsung pada hari ini)
+        $totalBelumLunas = Pemesanan::where('status', 'belum lunas')
+            ->whereDate('tanggal', Carbon::today())
+            ->count();
 
         // Mengirim data ke view
         return view('admin.dashboard', compact('totalUsers', 'totalAdmin', 'totalBelumLunas'));
@@ -177,24 +181,29 @@ class AdminController extends Controller
         }
     }
 
-    public function konfirmasiPenukaranPoin(Request $request)
-    {
-        $request->validate([
-            'kode_voucher' => 'required',
-        ]);
+        public function konfirmasiPenukaranPoin(Request $request)
+        {
+            $request->validate([
+                'kode_voucher' => 'required',
+            ]);
 
-        // Cari reward point berdasarkan kode voucher
-        $rewardPoint = RewardPoint::where('kode_voucher', $request->kode_voucher)->first();
+            // Cari reward point berdasarkan kode voucher
+            $rewardPoint = RewardPoint::where('kode_voucher', $request->kode_voucher)->first();
 
-        if ($rewardPoint) {
-            // Hapus reward point dari database (karena sudah ditukar)
-            $rewardPoint->delete();
+            if ($rewardPoint) {
+                // Jika reward point belum 10, tidak bisa ditukar
+                if ($rewardPoint->point < 10) {
+                    return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Mohon maaf, point anda belum mencapai 10. Silakan bermain terlebih dahulu dan kumpulkan point anda untuk melakukan penukaran.');
+                }
 
-            return redirect()->route('admin.konfirmasi-penukaran-poin')->with('success', 'Penukaran poin berhasil dikonfirmasi.');
-        } else {
-            return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Kode voucher tidak ditemukan.');
+                // Hapus reward point dari database (karena sudah ditukar)
+                $rewardPoint->delete();
+
+                return redirect()->route('admin.konfirmasi-penukaran-poin')->with('success', 'Penukaran poin berhasil dikonfirmasi.');
+            } else {
+                return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Kode voucher tidak ditemukan.');
+            }
         }
-    }
     public function showKonfirmasiPenukaranPoin()
     {
         return view('admin.konfirmasi-penukaran-poin');
@@ -319,7 +328,7 @@ class AdminController extends Controller
                     $status     = null;
                 }
 
-                Pemesanan::create([
+                $pemesanan = Pemesanan::create([
                     'user_id'       => $user->id,
                     'kode_pemesanan' => $kode_pemesanan,
                     'jadwal_id'     => $jadwal->id,
@@ -335,8 +344,11 @@ class AdminController extends Controller
                 ]);
             }
 
-            // Kirim notifikasi WhatsApp jika diperlukan
-            // $this->KirimNotifikasiWhatsApp($pemesanan);
+          
+
+            if (!$is_gratis) {
+                      NotifikasiHelper::kirimWhatsApp($pemesanan);
+                  }
 
             DB::commit();
             return redirect()->route('admin.data-pemesanan')
@@ -469,6 +481,9 @@ class AdminController extends Controller
                     'status'         => $status,
                 ]);
             }
+
+            $pemesananBaru = Pemesanan::where('kode_pemesanan', $kode_pemesanan)->first();
+            NotifikasiHelper::kirimWhatsApp($pemesananBaru, true);
 
             DB::commit();
             return redirect()->route('admin.data-pemesanan')

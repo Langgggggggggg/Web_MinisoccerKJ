@@ -42,7 +42,7 @@
             <div class="p-4 bg-red-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-lg font-semibold">Pemesanan Belum Lunas</h2>
+                        <h2 class="text-lg font-semibold">Pemesanan Belum Lunas Hari Ini</h2>
                         <p class="text-3xl font-bold">{{ $totalBelumLunas }}</p>
                     </div>
                     <i class="fas fa-exclamation-circle  text-4xl"></i>

@@ -11,7 +11,7 @@ use App\Http\Controllers\RewardPointController;
 // Rute Publik
 // ===============================
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing_page.partials.home');
 });
 
 // ===============================
