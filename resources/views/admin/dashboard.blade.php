@@ -22,9 +22,7 @@
                 </a>
             </div>
 
-
             <!-- Total Admin -->
-
             <div class="p-4 bg-green-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
@@ -45,14 +43,40 @@
                         <h2 class="text-lg font-semibold">Pemesanan Belum Lunas Hari Ini</h2>
                         <p class="text-3xl font-bold">{{ $totalBelumLunas }}</p>
                     </div>
-                    <i class="fas fa-exclamation-circle  text-4xl"></i>
+                    <i class="fas fa-exclamation-circle text-4xl"></i>
                 </div>
-                <a href="{{ route('admin.data-pemesanan') }}"
-                    class="mt-4 block text-white text-sm font-semibold underline items-center">
+                <a href="{{ route('admin.data-pemesanan') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat data <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
 
+            <!-- Total Pendapatan Bulan Ini -->
+            <div class="p-4 bg-yellow-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold">Pendapatan Bulan Ini</h2>
+                        <p class="text-3xl font-bold">Rp {{ number_format($pendapatanBulanIni, 0, ',', '.') }}</p>
+                    </div>
+                    <i class="fas fa-money-bill-wave text-4xl mr-4"></i>
+                </div>
+                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                    Lihat detail <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Total Pendapatan Keseluruhan -->
+            <div class="p-4 bg-teal-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold">Pendapatan Keseluruhan</h2>
+                        <p class="text-3xl font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                    </div>
+                    <i class="fas fa-wallet text-4xl mr-4"></i>
+                </div>
+                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                    Lihat detail <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
 
         </div>
     </div>

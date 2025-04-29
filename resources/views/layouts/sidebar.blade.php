@@ -81,6 +81,11 @@
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.data-user') ? 'bg-emerald-600' : '' }}">
                             <i class="fas fa-user w-5 h-5 mr-2"></i> Data User
                         </a>
+                        <a href="{{ route('admin.keuangan') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.keuangan') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Keuangan
+                        </a>
+
                     </div>
                 </div>
 

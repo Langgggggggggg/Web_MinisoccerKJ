@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Pemesanan;
 use App\Models\Jadwal;
+use App\Models\Keuangan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -30,9 +31,303 @@ class AdminController extends Controller
             ->whereDate('tanggal', Carbon::today())
             ->count();
 
+        // Menghitung total pendapatan (sum dari jumlah) untuk bulan ini
+        $pendapatanBulanIni = Keuangan::where('bulan', Carbon::now()->format('Y-m'))
+            ->sum('jumlah');
+
+        // Menghitung total pendapatan keseluruhan
+        $totalPendapatan = Keuangan::sum('jumlah');
+
         // Mengirim data ke view
-        return view('admin.dashboard', compact('totalUsers', 'totalAdmin', 'totalBelumLunas'));
+        return view('admin.dashboard', compact(
+            'totalUsers',
+            'totalAdmin',
+            'totalBelumLunas',
+            'pendapatanBulanIni',
+            'totalPendapatan'
+        ));
     }
+    // public function dataKeuangan(Request $request)
+    // {
+    //     // Ambil parameter dari request
+    //     $bulan = $request->get('bulan', date('Y-m')); // Format: YYYY-MM
+    //     $view_type = $request->get('view_type', 'monthly'); // Default view: monthly, options: daily, weekly, monthly
+
+    //     // Parse tanggal dari bulan yang dipilih
+    //     $date = \Carbon\Carbon::createFromFormat('Y-m', $bulan);
+    //     $start_date = clone $date->startOfMonth();
+    //     $end_date = clone $date->endOfMonth();
+
+    //     // Query base untuk data keuangan pada bulan tersebut
+    //     $keuangan = Keuangan::where('bulan', $bulan)
+    //         ->orderBy('tanggal', 'asc')
+    //         ->get();
+
+    //     // Untuk perhitungan total bulan ini
+    //     $totalPendapatanBulanIni = $keuangan->sum('jumlah');
+
+    //     // Data yang akan dikirim ke view sesuai dengan jenis tampilan
+    //     $groupedData = [];
+
+    //     switch ($view_type) {
+    //         case 'daily':
+    //             // Kelompokkan per hari
+    //             $groupedData = $keuangan->groupBy(function ($item) {
+    //                 return \Carbon\Carbon::parse($item->tanggal)->format('Y-m-d');
+    //             })->map(function ($items) {
+    //                 return [
+    //                     'date' => \Carbon\Carbon::parse($items->first()->tanggal)->format('d F Y'),
+    //                     'count' => $items->count(),
+    //                     'total' => $items->sum('jumlah')
+    //                 ];
+    //             });
+    //             break;
+
+    //         case 'weekly':
+    //             // Kelompokkan per minggu
+    //             $currentDate = clone $start_date;
+    //             $weekData = [];
+
+    //             while ($currentDate <= $end_date) {
+    //                 $weekStart = clone $currentDate->startOfWeek();
+    //                 $weekEnd = clone $currentDate->endOfWeek();
+
+    //                 // Filter data untuk minggu ini
+    //                 $weekItems = $keuangan->filter(function ($item) use ($weekStart, $weekEnd) {
+    //                     $itemDate = \Carbon\Carbon::parse($item->tanggal);
+    //                     return $itemDate >= $weekStart && $itemDate <= $weekEnd;
+    //                 });
+
+    //                 if ($weekItems->count() > 0) {
+    //                     $weekData[$weekStart->format('W')] = [
+    //                         'date' => $weekStart->format('d M') . ' - ' . $weekEnd->format('d M Y'),
+    //                         'count' => $weekItems->count(),
+    //                         'total' => $weekItems->sum('jumlah')
+    //                     ];
+    //                 }
+
+    //                 $currentDate->addWeek();
+    //             }
+
+    //             $groupedData = collect($weekData);
+    //             break;
+
+    //         case 'monthly':
+    //         default:
+    //             // Kelompokkan per bulan (default)
+    //             $groupedData = $keuangan->groupBy(function ($item) {
+    //                 // Group by month name
+    //                 return \Carbon\Carbon::parse($item->tanggal)->format('F');
+    //             })->map(function ($items) {
+    //                 return [
+    //                     'date' => \Carbon\Carbon::parse($items->first()->tanggal)->format('F Y'),
+    //                     'count' => $items->count(),
+    //                     'total' => $items->sum('jumlah')
+    //                 ];
+    //             });
+    //             break;
+    //     }
+
+    //     // Statistik tambahan untuk dashboard
+    //     $hariIni = \Carbon\Carbon::now()->format('Y-m-d');
+    //     $mingguIni = \Carbon\Carbon::now()->startOfWeek()->format('Y-m-d');
+
+    //     $pendapatanHariIni = Keuangan::whereDate('tanggal', $hariIni)->sum('jumlah');
+    //     $pendapatanMingguIni = Keuangan::where('tanggal', '>=', $mingguIni)->sum('jumlah');
+
+    //     // Data untuk grafik (jika diperlukan)
+    //     $chartData = $this->prepareChartData($keuangan, $view_type, $start_date, $end_date);
+
+    //     return view('admin.keuangan', compact(
+    //         'groupedData',
+    //         'totalPendapatanBulanIni',
+    //         'bulan',
+    //         'view_type',
+    //         'pendapatanHariIni',
+    //         'pendapatanMingguIni',
+    //         'chartData'
+    //     ));
+    // }
+
+    // /**
+    //  * Menyiapkan data untuk grafik berdasarkan tipe tampilan
+    //  */
+    // private function prepareChartData($keuangan, $view_type, $start_date, $end_date)
+    // {
+    //     $chartData = [];
+
+    //     switch ($view_type) {
+    //         case 'daily':
+    //             // Siapkan data harian untuk grafik
+    //             $currentDate = clone $start_date;
+    //             while ($currentDate <= $end_date) {
+    //                 $dateStr = $currentDate->format('Y-m-d');
+    //                 $dayData = $keuangan->filter(function ($item) use ($dateStr) {
+    //                     return $item->tanggal == $dateStr;
+    //                 });
+
+    //                 $chartData[] = [
+    //                     'label' => $currentDate->format('d M'),
+    //                     'value' => $dayData->sum('jumlah')
+    //                 ];
+
+    //                 $currentDate->addDay();
+    //             }
+    //             break;
+
+    //         case 'weekly':
+    //             // Siapkan data mingguan untuk grafik
+    //             $currentDate = clone $start_date;
+    //             while ($currentDate <= $end_date) {
+    //                 $weekStart = clone $currentDate->startOfWeek();
+    //                 $weekEnd = clone $currentDate->endOfWeek();
+
+    //                 $weekData = $keuangan->filter(function ($item) use ($weekStart, $weekEnd) {
+    //                     $itemDate = \Carbon\Carbon::parse($item->tanggal);
+    //                     return $itemDate >= $weekStart && $itemDate <= $weekEnd;
+    //                 });
+
+    //                 $chartData[] = [
+    //                     'label' => 'W' . $weekStart->format('W'),
+    //                     'value' => $weekData->sum('jumlah')
+    //                 ];
+
+    //                 $currentDate->addWeek();
+
+    //                 // Hindari duplikasi minggu
+    //                 if ($currentDate->format('W') == $weekStart->format('W')) {
+    //                     $currentDate->addWeek();
+    //                 }
+    //             }
+    //             break;
+
+    //         case 'monthly':
+    //         default:
+    //             // Untuk tampilan bulanan, kita ambil data per hari dalam bulan tersebut
+    //             $chartData = $keuangan->groupBy(function ($item) {
+    //                 return \Carbon\Carbon::parse($item->tanggal)->format('d');
+    //             })->map(function ($items, $day) {
+    //                 return [
+    //                     'label' => 'Tgl ' . $day,
+    //                     'value' => $items->sum('jumlah')
+    //                 ];
+    //             })->values()->toArray();
+    //             break;
+    //     }
+
+    //     return $chartData;
+    // }
+
+    // public function exportKeuanganPDF(Request $request)
+    // {
+    //     // Ambil parameter dari request
+    //     $bulan = $request->get('bulan', date('Y-m'));
+    //     $view_type = $request->get('view_type', 'monthly');
+
+    //     // Parse tanggal dari bulan yang dipilih
+    //     $date = \Carbon\Carbon::createFromFormat('Y-m', $bulan);
+    //     $start_date = clone $date->startOfMonth();
+    //     $end_date = clone $date->endOfMonth();
+
+    //     // Query data keuangan
+    //     $keuangan = Keuangan::where('bulan', $bulan)
+    //         ->orderBy('tanggal', 'asc')
+    //         ->get();
+
+    //     // Untuk perhitungan total bulan ini
+    //     $totalPendapatanBulanIni = $keuangan->sum('jumlah');
+
+    //     // Data yang akan dikirim ke view sesuai dengan jenis tampilan
+    //     $groupedData = [];
+    //     $title = '';
+
+    //     switch ($view_type) {
+    //         case 'daily':
+    //             // Kelompokkan per hari
+    //             $groupedData = $keuangan->groupBy(function ($item) {
+    //                 return \Carbon\Carbon::parse($item->tanggal)->format('Y-m-d');
+    //             })->map(function ($items) {
+    //                 return [
+    //                     'date' => \Carbon\Carbon::parse($items->first()->tanggal)->format('d F Y'),
+    //                     'count' => $items->count(),
+    //                     'total' => $items->sum('jumlah')
+    //                 ];
+    //             });
+    //             $title = 'Laporan Keuangan Harian - ' . $date->format('F Y');
+    //             break;
+
+    //         case 'weekly':
+    //             // Kelompokkan per minggu
+    //             $currentDate = clone $start_date;
+    //             $weekData = [];
+
+    //             while ($currentDate <= $end_date) {
+    //                 $weekStart = clone $currentDate->startOfWeek();
+    //                 $weekEnd = clone $currentDate->endOfWeek();
+
+    //                 // Filter data untuk minggu ini
+    //                 $weekItems = $keuangan->filter(function ($item) use ($weekStart, $weekEnd) {
+    //                     $itemDate = \Carbon\Carbon::parse($item->tanggal);
+    //                     return $itemDate >= $weekStart && $itemDate <= $weekEnd;
+    //                 });
+
+    //                 if ($weekItems->count() > 0) {
+    //                     $weekData[$weekStart->format('W')] = [
+    //                         'date' => $weekStart->format('d M') . ' - ' . $weekEnd->format('d M Y'),
+    //                         'count' => $weekItems->count(),
+    //                         'total' => $weekItems->sum('jumlah')
+    //                     ];
+    //                 }
+
+    //                 $currentDate->addWeek();
+    //             }
+
+    //             $groupedData = collect($weekData);
+    //             $title = 'Laporan Keuangan Mingguan - ' . $date->format('F Y');
+    //             break;
+
+    //         case 'monthly':
+    //         default:
+    //             // Kelompokkan per bulan (default)
+    //             $groupedData = $keuangan->groupBy(function ($item) {
+    //                 // Group by month name
+    //                 return \Carbon\Carbon::parse($item->tanggal)->format('F');
+    //             })->map(function ($items) {
+    //                 return [
+    //                     'date' => \Carbon\Carbon::parse($items->first()->tanggal)->format('F Y'),
+    //                     'count' => $items->count(),
+    //                     'total' => $items->sum('jumlah')
+    //                 ];
+    //             });
+    //             $title = 'Laporan Keuangan Bulanan - ' . $date->format('F Y');
+    //             break;
+    //     }
+
+    //     // Buat tanggal untuk footer laporan
+    //     $tanggalCetak = now()->format('d F Y H:i:s');
+
+    //     // Siapkan data untuk view PDF
+    //     $data = [
+    //         'title' => $title,
+    //         'tanggalCetak' => $tanggalCetak,
+    //         'bulan' => $bulan,
+    //         'view_type' => $view_type,
+    //         'groupedData' => $groupedData,
+    //         'totalPendapatanBulanIni' => $totalPendapatanBulanIni,
+    //     ];
+
+    //     // Buat nama file PDF
+    //     $fileName = strtolower(str_replace(' ', '_', $title)) . '.pdf';
+
+    //     // Generate PDF
+    //     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.keuangan_pdf', $data);
+
+    //     // Setting PDF (opsional)
+    //     $pdf->setPaper('a4', 'portrait');
+
+    //     // Download PDF
+    //     return $pdf->download($fileName);
+    // }
     public function dataAdmin()
     {
         // Mengambil data pengguna dengan role admin
@@ -124,86 +419,94 @@ class AdminController extends Controller
 
         $pemesanan = Pemesanan::where('kode_pemesanan', $request->kode_pemesanan)->first();
 
-        if ($pemesanan) {
-            if ($pemesanan->status == "lunas") {
-                return redirect()->route('admin.konfirmasi-pelunasan')->with('error', 'Kode pemesanan sudah digunakan (Lunas).');
-            }
-
-            // Ubah sisa bayar menjadi 0
-            $pemesanan->sisa_bayar = 0;
-
-            // Ubah status pembayaran menjadi "Lunas"
-            $pemesanan->status = "Lunas";
-
-            // Simpan perubahan
-            $pemesanan->save();
-
-            // === LOGIKA PENAMBAHAN REWARD POINT ===
-            $durasi = (strtotime($pemesanan->jam_selesai) - strtotime($pemesanan->jam_mulai)) / 3600;
-
-            // Perhitungan reward point
-            $point_baru = $durasi; // 1 jam bermain = 1 point
-            $nominal_cashback = 0;
-
-            // Tentukan nominal cashback berdasarkan lapangan
-            if ($pemesanan->jadwal->lapangan >= 1 && $pemesanan->jadwal->lapangan <= 3) {
-                $nominal_cashback = $point_baru * 30000;
-            } elseif ($pemesanan->jadwal->lapangan >= 4 && $pemesanan->jadwal->lapangan <= 5) {
-                $nominal_cashback = $point_baru * 40000;
-            }
-
-            // Cek apakah tim sudah memiliki data di tabel reward_points
-            $reward = RewardPoint::where('kode_tim', $pemesanan->nama_tim)->first();
-
-            if ($reward) {
-                // Jika sudah ada, update data point dan nominal IDR
-                $reward->update([
-                    'point' => $reward->point + $point_baru,
-                    'idr' => $reward->idr + $nominal_cashback,
-                ]);
-            } else {
-                // Jika belum ada, buat data baru dengan kode voucher otomatis
-                $kode_voucher = strtoupper(substr(uniqid(), -5));
-
-                RewardPoint::create([
-                    'user_id' => $pemesanan->user_id,
-                    'kode_tim' => $pemesanan->nama_tim,
-                    'nama_tim' => $pemesanan->nama_tim,
-                    'point' => $point_baru,
-                    'idr' => $nominal_cashback,
-                    'kode_voucher' => $kode_voucher,
-                ]);
-            }
-
-            return redirect()->route('admin.konfirmasi-pelunasan')->with('success', 'Pelunasan berhasil dikonfirmasi. Reward point telah ditambahkan.');
-        } else {
+        if (!$pemesanan) {
             return redirect()->route('admin.konfirmasi-pelunasan')->with('error', 'Kode pemesanan tidak ditemukan.');
         }
+
+        if ($pemesanan->status == "lunas") {
+            return redirect()->route('admin.konfirmasi-pelunasan')->with('error', 'Kode pemesanan sudah digunakan (Lunas).');
+        }
+
+        // Hitung total pembayaran (DP + Sisa Bayar)
+        $total_pembayaran = $pemesanan->dp + $pemesanan->sisa_bayar;
+
+        // Ubah sisa bayar menjadi 0 dan status menjadi "Lunas"
+        $pemesanan->sisa_bayar = 0;
+        $pemesanan->status = "Lunas";
+        $pemesanan->save();
+
+        // === LOGIKA PENAMBAHAN REWARD POINT ===
+        $durasi = (strtotime($pemesanan->jam_selesai) - strtotime($pemesanan->jam_mulai)) / 3600;
+        $point_baru = $durasi; // 1 jam = 1 point
+        $nominal_cashback = 0;
+
+        // Tentukan nominal cashback berdasarkan lapangan
+        if ($pemesanan->jadwal->lapangan >= 1 && $pemesanan->jadwal->lapangan <= 3) {
+            $nominal_cashback = $point_baru * 30000;
+        } elseif ($pemesanan->jadwal->lapangan >= 4 && $pemesanan->jadwal->lapangan <= 5) {
+            $nominal_cashback = $point_baru * 40000;
+        }
+
+        // Cek apakah tim sudah ada di reward_points
+        $reward = RewardPoint::where('kode_tim', $pemesanan->nama_tim)->first();
+
+        if ($reward) {
+            // Jika sudah ada, update
+            $reward->update([
+                'point' => $reward->point + $point_baru,
+                'idr' => $reward->idr + $nominal_cashback,
+            ]);
+        } else {
+            // Jika belum ada, buat baru
+            $kode_voucher = strtoupper(substr(uniqid(), -5));
+
+            RewardPoint::create([
+                'user_id' => $pemesanan->user_id,
+                'kode_tim' => $pemesanan->nama_tim,
+                'nama_tim' => $pemesanan->nama_tim,
+                'point' => $point_baru,
+                'idr' => $nominal_cashback,
+                'kode_voucher' => $kode_voucher,
+            ]);
+        }
+
+        // === CATAT KE TABEL KEUANGAN (PAKAI TANGGAL JADWAL MAIN, BUKAN now()) ===
+        $tanggal_main = $pemesanan->jadwal->tanggal; // pastikan relasi jadwal ada
+        $bulan_main = date('Y-m', strtotime($tanggal_main));
+
+        Keuangan::create([
+            'tanggal' => $tanggal_main,
+            'bulan' => $bulan_main,
+            'jumlah' => $total_pembayaran,
+            // 'keterangan' => 'Pelunasan kode pemesanan: ' . $pemesanan->kode_pemesanan,
+        ]);
+
+        return redirect()->route('admin.konfirmasi-pelunasan')->with('success', 'Pelunasan berhasil dikonfirmasi. Reward point telah ditambahkan dan keuangan tercatat.');
     }
 
-        public function konfirmasiPenukaranPoin(Request $request)
-        {
-            $request->validate([
-                'kode_voucher' => 'required',
-            ]);
+    public function konfirmasiPenukaranPoin(Request $request)
+    {
+        $request->validate([
+            'kode_voucher' => 'required',
+        ]);
 
-            // Cari reward point berdasarkan kode voucher
-            $rewardPoint = RewardPoint::where('kode_voucher', $request->kode_voucher)->first();
+        // Cari reward point berdasarkan kode voucher
+        $rewardPoint = RewardPoint::where('kode_voucher', $request->kode_voucher)->first();
 
-            if ($rewardPoint) {
-                // Jika reward point belum 10, tidak bisa ditukar
-                if ($rewardPoint->point < 10) {
-                    return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Mohon maaf, point anda belum mencapai 10. Silakan bermain terlebih dahulu dan kumpulkan point anda untuk melakukan penukaran.');
-                }
-
-                // Hapus reward point dari database (karena sudah ditukar)
-                $rewardPoint->delete();
-
-                return redirect()->route('admin.konfirmasi-penukaran-poin')->with('success', 'Penukaran poin berhasil dikonfirmasi.');
-            } else {
-                return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Kode voucher tidak ditemukan.');
+        if ($rewardPoint) {
+            // Jika reward point belum 10, tidak bisa ditukar
+            if ($rewardPoint->point < 10) {
+                return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Mohon maaf, point anda belum mencapai 10. Silakan bermain terlebih dahulu dan kumpulkan point anda untuk melakukan penukaran.');
             }
+
+            // Hapus reward point dari database (karena sudah ditukar)
+            $rewardPoint->delete();
+
+            return redirect()->route('admin.konfirmasi-penukaran-poin')->with('success', 'Penukaran poin berhasil dikonfirmasi.');
+        } else {
+            return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Kode voucher tidak ditemukan.');
         }
+    }
     public function showKonfirmasiPenukaranPoin()
     {
         return view('admin.konfirmasi-penukaran-poin');
@@ -344,11 +647,11 @@ class AdminController extends Controller
                 ]);
             }
 
-          
+
 
             if (!$is_gratis) {
-                      NotifikasiHelper::kirimWhatsApp($pemesanan);
-                  }
+                NotifikasiHelper::kirimWhatsApp($pemesanan);
+            }
 
             DB::commit();
             return redirect()->route('admin.data-pemesanan')
@@ -495,3 +798,4 @@ class AdminController extends Controller
         }
     }
 }
+

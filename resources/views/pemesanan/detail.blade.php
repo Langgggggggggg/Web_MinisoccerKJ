@@ -79,7 +79,14 @@
                                                 Ubah Jadwal
                                             </a>
                                         @endif
+                                    
+                                        @if ($pesan->status == 'belum lunas')
+                                        <a href="#" class="btn btn-sm btn-warning">
+                                            Ajukan Refund
+                                        </a>
+                                        @endif
                                     </td>
+                                    
                                 @endif
                             </tr>
                         @endforeach

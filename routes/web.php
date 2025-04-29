@@ -3,10 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RewardPointController;
-
+use App\Http\Controllers\GoogleController;
 // ===============================
 // Rute Publik
 // ===============================
@@ -14,6 +15,8 @@ Route::get('/', function () {
     return view('landing_page.partials.home');
 });
 
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 // ===============================
 // Dashboard (Autentikasi + Verifikasi)
 // ===============================
@@ -68,6 +71,7 @@ Route::middleware('auth')->group(function () {
 
 // ===============================
 // Panel Admin (Autentikasi + Middleware Admin)
+
 // ===============================
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
     // Dashboard
@@ -82,6 +86,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     // Data Pemesanan dan Reward
     Route::get('/admin/pemesanan', [AdminController::class, 'dataPemesanan'])->name('admin.data-pemesanan');
     Route::get('/admin/reward-points', [AdminController::class, 'dataRewardPoint'])->name('admin.reward-points');
+    
+    // Route untuk pengelolaan keuangan
+    Route::get('/admin/keuangan', [KeuanganController::class, 'dataKeuangan'])->name('admin.keuangan');
+    Route::get('/admin/keuangan/export', [KeuanganController::class, 'exportKeuanganPDF'])->name('admin.keuangan.export');
 
     // Konfirmasi Penukaran Poin
     Route::get('/admin/konfirmasi-penukaran-poin', [AdminController::class, 'showKonfirmasiPenukaranPoin'])->name('admin.konfirmasi-penukaran-poin');
@@ -99,10 +107,11 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::post('/admin/pemesanan/store', [AdminController::class, 'storePemesanan'])->name('admin.pemesanan.store');
     Route::get('/admin/pemesanan/{id}/edit', [AdminController::class, 'editPemesanan'])->name('admin.editPemesanan');
     Route::post('/admin/pemesanan/{id}/update', [AdminController::class, 'updatePemesanan'])->name('admin.updatePemesanan');
+
+    // Rute untuk halaman Keuangan
 });
 
 // ===============================
 // Rute Auth
 // ===============================
 require __DIR__ . '/auth.php';
-
