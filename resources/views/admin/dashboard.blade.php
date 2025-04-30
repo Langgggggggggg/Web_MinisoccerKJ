@@ -77,6 +77,19 @@
                     Lihat detail <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
+            <!-- Total Pengajuan Refund -->
+            <div class="p-4 bg-purple-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold">Pengajuan Pembatalan</h2>
+                        <p class="text-3xl font-bold">{{ $totalPengajuanRefund }}</p>
+                    </div>
+                    <i class="fas fa-undo-alt text-4xl mr-4"></i>
+                </div>
+                <a href="{{ route('admin.refunds.index') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                    Lihat data <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
 
         </div>
     </div>

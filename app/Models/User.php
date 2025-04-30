@@ -52,4 +52,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pemesanan::class, 'user_id');
     }
+    public function refund()
+    {
+        return $this->hasOne(Refund::class);
+    }
 }

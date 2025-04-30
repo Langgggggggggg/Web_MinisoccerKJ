@@ -13,7 +13,6 @@ class CreateKeuanganTable extends Migration
             $table->date('tanggal');             // Tanggal transaksi
             $table->string('bulan', 7);           // Format YYYY-MM
             $table->bigInteger('jumlah');         // Jumlah uang masuk
-            // $table->text('keterangan')->nullable(); // Keterangan opsional
             $table->timestamps();
         });
     }

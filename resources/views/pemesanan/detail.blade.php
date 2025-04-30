@@ -26,8 +26,8 @@
             </div>
 
             <table class="table-auto w-full text-center text-sm text-gray-700">
-                <thead class="bg-emerald-600">
-                    <tr class="text-white">
+                <thead class="bg-gray-50">
+                    <tr class="text-gray-500">
                         <th class="px-4 py-2 border-b">Kode Pemesanan</th>
                         <th class="px-4 py-2 border-b">Nama Tim</th>
                         <th class="px-4 py-2 border-b">Tanggal</th>
@@ -71,20 +71,21 @@
                                             {{ ucfirst($pesan->status) }}
                                         </span>
                                     </td>
-
                                     <td class="px-4 py-2 border-b aksiColumn" id="aksiColumn" style="display: none;">
-                                        @if ($pesan->status == 'belum lunas' && $loop->first)
-                                            <a href="{{ route('pemesanan.edit', $pesan->kode_pemesanan) }}"
-                                                class="inline-block bg-green-700 hover:bg-green-600 text-white text-xs md:text-sm font-medium px-3 py-1 rounded-md shadow transition duration-200 text-center whitespace-nowrap">
-                                                Ubah Jadwal
-                                            </a>
-                                        @endif
-                                    
-                                        @if ($pesan->status == 'belum lunas')
-                                        <a href="#" class="btn btn-sm btn-warning">
-                                            Ajukan Refund
-                                        </a>
-                                        @endif
+                                        <div class="flex flex-col md:flex-row space-x-2 space-y-2 md:space-y-0">
+                                            @if ($pesan->status == 'belum lunas' && $loop->first)
+                                                <a href="{{ route('pemesanan.edit', $pesan->kode_pemesanan) }}"
+                                                    class="inline-block bg-green-700 hover:bg-green-600 text-white text-xs md:text-sm font-medium px-3 py-1 rounded-md shadow transition duration-200 text-center whitespace-nowrap">
+                                                    Ubah Jadwal
+                                                </a>
+                                            @endif
+                                            @if ($pesan->status == 'belum lunas')
+                                                <a href="{{ route('refunds.create', $pesan->id) }}"
+                                                    class="inline-block bg-red-700 hover:bg-red-600 text-white text-xs md:text-sm font-medium px-3 py-1 rounded-md shadow transition duration-200 text-center whitespace-nowrap">
+                                                    Ajukan Refund
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                     
                                 @endif

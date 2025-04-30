@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Pemesanan;
 use App\Models\Jadwal;
 use App\Models\Keuangan;
+use App\Models\Refund;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -38,13 +39,17 @@ class AdminController extends Controller
         // Menghitung total pendapatan keseluruhan
         $totalPendapatan = Keuangan::sum('jumlah');
 
+        // Menghitung total pengajuan refund
+        $totalPengajuanRefund = Refund::where('status', 'diajukan')->count();
+
         // Mengirim data ke view
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalAdmin',
             'totalBelumLunas',
             'pendapatanBulanIni',
-            'totalPendapatan'
+            'totalPendapatan',
+            'totalPengajuanRefund'
         ));
     }
     // public function dataKeuangan(Request $request)

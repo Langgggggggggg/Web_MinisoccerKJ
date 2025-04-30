@@ -114,19 +114,52 @@
                 jam_selesai: document.querySelector('input[name="jam_selesai"]').value,
                 nama_tim: document.querySelector('input[name="nama_tim"]').value,
                 no_telepon: document.querySelector('input[name="no_telepon"]').value,
-                dp: document.querySelector('input[name="dp"]').value,
+                dp: parseInt(document.querySelector('input[name="dp"]').value),
             };
-    
-            // Cek jika DP kurang dari 100000
+
+            // Validasi DP minimal
             if (formData.dp < 100000) {
                 Swal.fire({
                     icon: 'error',
                     title: 'DP yang anda bayar kurang',
                     text: 'Minimal DP yang harus dibayar adalah Rp 100.000!',
                 });
-                return; // Berhenti proses jika DP kurang
+                return;
             }
-    
+
+            // Hitung total biaya sewa berdasarkan lapangan dan jam
+            const jamMulai = parseInt(formData.jam_mulai.split(":")[0]);
+            const jamSelesai = parseInt(formData.jam_selesai.split(":")[0]);
+            const durasi = jamSelesai - jamMulai;
+
+            let hargaPerJam = 0;
+            const lap = parseInt(formData.lapangan);
+
+            if ([1, 2, 3].includes(lap)) {
+                hargaPerJam = jamMulai < 17 ? 300000 : 350000;
+            } else if ([4, 5].includes(lap)) {
+                hargaPerJam = jamMulai < 17 ? 400000 : 450000;
+            }
+
+            const totalBiaya = hargaPerJam * durasi;
+
+            // Jika DP melebihi total biaya, langsung tolak
+            if (formData.dp > totalBiaya) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'DP Terlalu Besar',
+                    html: `Total biaya sewa lapangan adalah <b>Rp ${totalBiaya.toLocaleString()}</b><br>
+                   DP yang Anda masukkan: <b>Rp ${formData.dp.toLocaleString()}</b><br><br>
+                   DP yang anda masukkan melebihi total biaya sewa lapangan, silahkan masukkan DP yang sesuai.`,
+                });
+                return;
+            }
+
+            // Lanjut proses pembayaran
+            lanjutkanPembayaran(formData);
+        }
+
+        function lanjutkanPembayaran(formData) {
             Swal.fire({
                 icon: 'info',
                 title: 'Mohon Tunggu',
@@ -136,7 +169,7 @@
                     Swal.showLoading();
                 }
             });
-    
+
             fetch("/pemesanan/validateSchedule", {
                     method: "POST",
                     headers: {
@@ -185,5 +218,4 @@
                 });
         }
     </script>
-    
 @endsection

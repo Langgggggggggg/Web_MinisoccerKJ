@@ -56,6 +56,12 @@ class PemesananController extends Controller
 
         DB::beginTransaction();
         try {
+            foreach ($jadwals as $jadwal) {
+                $cekPemesanan = Pemesanan::where('jadwal_id', $jadwal->id)->exists();
+                if ($cekPemesanan) {
+                    return back()->withErrors(['error' => 'Jadwal yang dipilih sudah dipesan. Silakan pilih waktu lain.']);
+                }
+            }
             foreach ($jadwals as $index => $jadwal) {
                 // Hitung durasi bermain dalam jam
                 $durasi = (strtotime($request->jam_selesai) - strtotime($request->jam_mulai)) / 3600;

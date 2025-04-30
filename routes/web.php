@@ -8,6 +8,8 @@ use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RewardPointController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\RefundController;
+use App\Http\Controllers\RefundAdminController;
 // ===============================
 // Rute Publik
 // ===============================
@@ -31,6 +33,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/refund', [RefundController::class, 'index'])->name('refunds.index');
+    Route::get('/refunds/create/{pemesanan_id}', [RefundController::class, 'create'])->name('refunds.create');
+    Route::post('/refunds', [RefundController::class, 'store'])->name('refunds.store');
 });
 
 // ===============================
@@ -108,7 +117,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::get('/admin/pemesanan/{id}/edit', [AdminController::class, 'editPemesanan'])->name('admin.editPemesanan');
     Route::post('/admin/pemesanan/{id}/update', [AdminController::class, 'updatePemesanan'])->name('admin.updatePemesanan');
 
-    // Rute untuk halaman Keuangan
+    Route::get('/admin/refund', [RefundAdminController::class, 'index'])->name('admin.refunds.index');
+    Route::get('/refund/{id}', [RefundAdminController::class, 'show'])->name('admin.refunds.show');
+    Route::post('/refund/{id}/approve', [RefundAdminController::class, 'approve'])->name('admin.refunds.approve');
+    Route::post('/refund/{id}/reject', [RefundAdminController::class, 'reject'])->name('admin.refunds.reject');
 });
 
 // ===============================

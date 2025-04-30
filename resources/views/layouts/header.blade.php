@@ -39,8 +39,14 @@
                     echo '<i class="fas fa-user-plus mr-2"></i> Tambah Admin';
                 } elseif (request()->routeIs('admin.editPemesanan')) {
                     echo '<i class="fas fa-edit mr-2"></i> Ubah Jadwal Pemesanan';
-
-                    // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('refunds.create')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i> Ajukan Refund';
+                } elseif (request()->routeIs('refunds.index')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i> Data Refund';
+                } elseif (request()->routeIs('admin.refunds.index')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i> Data Refund';
+                } elseif (request()->routeIs('admin.refunds.show')) {
+                    echo '<i class="fas fa-file-alt mr-2"></i> Detail Refund';                    // Default jika tidak sesuai rute manapun
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }

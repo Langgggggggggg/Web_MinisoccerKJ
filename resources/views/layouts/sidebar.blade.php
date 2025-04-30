@@ -45,6 +45,11 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('reward.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-gift w-5 h-5 mr-2"></i> Reward Point
                 </a>
+                <a href="{{ route('refunds.index') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.refund.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Refund
+                </a>
+                
             @endif
 
             @if (Auth::user()->role === 'admin')
@@ -85,7 +90,10 @@
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.keuangan') ? 'bg-emerald-600' : '' }}">
                             <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Keuangan
                         </a>
-
+                        <a href="{{ route('admin.refunds.index') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.refunds.index') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Data Refunds
+                        </a>
                     </div>
                 </div>
 
