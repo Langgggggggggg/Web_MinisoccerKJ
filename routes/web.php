@@ -108,7 +108,6 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::get('/admin/data-admin', [AdminController::class, 'dataAdmin'])->name('admin.data-admin');
     Route::get('/admin/tambah-admin', [AdminController::class, 'createAdmin'])->name('admin.create');
     Route::post('/admin/tambah-admin', [AdminController::class, 'storeAdmin'])->name('admin.store');
-    Route::get('/admin/{id}/edit', [AdminController::class, 'edit'])->name('admin.edit');
     Route::put('/admin/{id}/update', [AdminController::class, 'update'])->name('admin.update');
 
     // Pemesanan oleh Admin
@@ -116,7 +115,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::post('/admin/pemesanan/store', [AdminController::class, 'storePemesanan'])->name('admin.pemesanan.store');
     Route::get('/admin/pemesanan/{id}/edit', [AdminController::class, 'editPemesanan'])->name('admin.editPemesanan');
     Route::post('/admin/pemesanan/{id}/update', [AdminController::class, 'updatePemesanan'])->name('admin.updatePemesanan');
+    Route::delete('/admin/pemesanan/{id}/hapus', [AdminController::class, 'hapusPemesanan'])->name('admin.pemesanan.hapus');
+    
 
+    // Pengajuan Refund
     Route::get('/admin/refund', [RefundAdminController::class, 'index'])->name('admin.refunds.index');
     Route::get('/refund/{id}', [RefundAdminController::class, 'show'])->name('admin.refunds.show');
     Route::post('/refund/{id}/approve', [RefundAdminController::class, 'approve'])->name('admin.refunds.approve');

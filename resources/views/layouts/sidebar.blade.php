@@ -49,13 +49,12 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.refund.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Refund
                 </a>
-                
             @endif
 
             @if (Auth::user()->role === 'admin')
                 <a href="{{ route('admin.dashboard') }}"
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600' : '' }}">
-                    <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Admin Dashboard
+                    <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Dashboard Pengelola
                 </a>
                 <a href="{{ route('jadwal.index') }}"
                     class="lazy-loading block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
@@ -76,27 +75,26 @@
                         </a>
                         <a href="{{ route('admin.reward-points') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.reward-points') ? 'bg-emerald-600' : '' }}">
-                            <i class="fas fa-gift w-5 h-5 mr-2"></i> Data Reward Points
+                            <i class="fas fa-gift w-5 h-5 mr-2"></i> Data Reward Point
                         </a>
                         <a href="{{ route('admin.data-admin') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.data-admin') ? 'bg-emerald-600' : '' }}">
-                            <i class="fas fa-user-cog w-5 h-5 mr-2"></i> Data Admin
+                            <i class="fas fa-user-cog w-5 h-5 mr-2"></i> Data Pengelola
                         </a>
                         <a href="{{ route('user.data-user') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.data-user') ? 'bg-emerald-600' : '' }}">
-                            <i class="fas fa-user w-5 h-5 mr-2"></i> Data User
+                            <i class="fas fa-user w-5 h-5 mr-2"></i> Data Penyewa
                         </a>
                         <a href="{{ route('admin.keuangan') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.keuangan') ? 'bg-emerald-600' : '' }}">
                             <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Keuangan
                         </a>
-                        <a href="{{ route('admin.refunds.index') }}"
-                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.refunds.index') ? 'bg-emerald-600' : '' }}">
-                            <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Data Refunds
-                        </a>
                     </div>
                 </div>
-
+                <a href="{{ route('admin.refunds.index') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.refunds.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Pengajuan Refund
+                </a>
                 <!-- Dropdown Konfirmasi/Transaksi -->
                 <div x-data="{ open: {{ request()->routeIs('admin.konfirmasi-pelunasan') || request()->routeIs('admin.konfirmasi-penukaran-poin') ? 'true' : 'false' }} }">
                     <button @click="open = !open"

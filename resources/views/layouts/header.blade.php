@@ -18,21 +18,21 @@
                 } elseif (request()->routeIs('reward.index')) {
                     echo '<i class="fas fa-gift mr-2"></i> Reward Point';
                 } elseif (request()->routeIs('user.data-user')) {
-                    echo '<i class="fas fa-user mr-2"></i> Data User';
+                    echo '<i class="fas fa-user mr-2"></i> Data Penyewa';
 
                     // Bagian Admin
                 } elseif (request()->routeIs('admin.dashboard')) {
-                    echo '<i class="fas fa-user-shield mr-2"></i> Admin Dashboard';
+                    echo '<i class="fas fa-user-shield mr-2"></i> Dashboard Pengelola';
                 } elseif (request()->routeIs('admin.data-pemesanan')) {
                     echo '<i class="fas fa-file-alt mr-2"></i> Data Pemesanan';
                 } elseif (request()->routeIs('admin.konfirmasi-pelunasan')) {
                     echo '<i class="fas fa-money-check-alt mr-2"></i> Konfirmasi Pelunasan';
                 } elseif (request()->routeIs('admin.reward-points')) {
-                    echo '<i class="fas fa-gift mr-2"></i> Perolehan Reward Points';
+                    echo '<i class="fas fa-gift mr-2"></i> Perolehan Reward Point';
                 } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
                     echo '<i class="fas fa-gift mr-2"></i> Penukaran Poin';
                 } elseif (request()->routeIs('admin.data-admin')) {
-                    echo '<i class="fas fa-user-cog mr-2"></i> Data Admin';
+                    echo '<i class="fas fa-user-cog mr-2"></i> Data Pengelola';
                 } elseif (request()->routeIs('admin.edit')) {
                     echo '<i class="fas fa-user-edit mr-2"></i> Edit Profil Admin';
                 } elseif (request()->routeIs('admin.create')) {

@@ -12,7 +12,7 @@
             <div class="p-4 bg-blue-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-lg font-semibold">Total Pengguna</h2>
+                        <h2 class="text-lg font-semibold">Total Penyewa</h2>
                         <p class="text-3xl font-bold">{{ $totalUsers }}</p>
                     </div>
                     <i class="fas fa-users text-4xl mr-4"></i>
@@ -26,7 +26,7 @@
             <div class="p-4 bg-green-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-lg font-semibold">Total Admin</h2>
+                        <h2 class="text-lg font-semibold">Total Pengelola</h2>
                         <p class="text-3xl font-bold">{{ $totalAdmin }}</p>
                     </div>
                     <i class="fas fa-user-shield text-4xl mr-4"></i>

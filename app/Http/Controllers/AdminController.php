@@ -353,16 +353,7 @@ class AdminController extends Controller
     {
         return view('admin.tambah-admin');
     }
-    public function edit($id)
-    {
-        $admin = Auth::user();
-
-        if ($admin->id != $id) {
-            return redirect()->route('admin.data-admin')->with('error', 'Anda tidak memiliki izin untuk mengedit admin lain.');
-        }
-
-        return view('admin.edit', compact('admin'));
-    }
+    
 
     public function update(Request $request, $id)
     {
@@ -800,6 +791,28 @@ class AdminController extends Controller
             DB::rollBack();
             return redirect()->route('admin.data-pemesanan')
                 ->with('error', 'Terjadi kesalahan saat update: ' . $e->getMessage());
+        }
+    }
+    
+    public function hapusPemesanan($id)
+    {
+        $pemesanan = Pemesanan::findOrFail($id);
+        if ($pemesanan->status === 'lunas') {
+            return redirect()->route('admin.data-pemesanan')
+                ->with('error', 'Pemesanan sudah lunas dan tidak dapat dihapus.');
+        }
+        
+        DB::beginTransaction();
+        try {
+            // hapus semua entri lama
+            Pemesanan::where('kode_pemesanan', $pemesanan->kode_pemesanan)->delete();
+            DB::commit();
+            return redirect()->route('admin.data-pemesanan')
+                ->with('success', 'Pemesanan berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.data-pemesanan')
+                ->with('error', 'Terjadi kesalahan saat hapus: ' . $e->getMessage());
         }
     }
 }
