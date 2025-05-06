@@ -95,6 +95,10 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.refunds.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-file-alt w-5 h-5 mr-2"></i> Pengajuan Refund
                 </a>
+                <a href="{{ route('admin.information.index') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.information.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-info-circle w-5 h-5 mr-2"></i> Informasi
+                </a>
                 <!-- Dropdown Konfirmasi/Transaksi -->
                 <div x-data="{ open: {{ request()->routeIs('admin.konfirmasi-pelunasan') || request()->routeIs('admin.konfirmasi-penukaran-poin') ? 'true' : 'false' }} }">
                     <button @click="open = !open"

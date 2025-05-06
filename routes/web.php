@@ -10,11 +10,15 @@ use App\Http\Controllers\RewardPointController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundAdminController;
+use  App\Http\Controllers\InformationController;
 // ===============================
 // Rute Publik
 // ===============================
 Route::get('/', function () {
     return view('landing_page.partials.home');
+});
+Route::get('/tatacara-pemesanan', function () {
+    return view('landing_page.information.tatacara-pemesanan');
 });
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
@@ -41,7 +45,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/refunds/create/{pemesanan_id}', [RefundController::class, 'create'])->name('refunds.create');
     Route::post('/refunds', [RefundController::class, 'store'])->name('refunds.store');
 });
-
+Route::get('/informasi', [InformationController::class, 'publicIndex'])->name('landing.information.index');
+// Halaman informasi detail publik
+Route::get('/informasi/{slug}', [InformationController::class, 'show'])->name('information.show');
 // ===============================
 // Jadwal (Autentikasi)
 // ===============================
@@ -123,7 +129,17 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::get('/refund/{id}', [RefundAdminController::class, 'show'])->name('admin.refunds.show');
     Route::post('/refund/{id}/approve', [RefundAdminController::class, 'approve'])->name('admin.refunds.approve');
     Route::post('/refund/{id}/reject', [RefundAdminController::class, 'reject'])->name('admin.refunds.reject');
+     // CRUD Informasi (Admin)
+     Route::get('/admin/information', [InformationController::class, 'index'])->name('admin.information.index');
+     Route::get('/admin/information/create', [InformationController::class, 'create'])->name('admin.information.create');
+     Route::post('/admin/information', [InformationController::class, 'store'])->name('admin.information.store');
+     Route::get('/admin/information/{information}/edit', [InformationController::class, 'edit'])->name('admin.information.edit');
+     Route::put('/admin/information/{information}', [InformationController::class, 'update'])->name('admin.information.update');
+     Route::delete('/admin/information/{information}', [InformationController::class, 'destroy'])->name('admin.information.destroy');
 });
+
+
+
 
 // ===============================
 // Rute Auth
