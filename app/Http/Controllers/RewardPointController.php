@@ -41,6 +41,10 @@ class RewardPointController extends Controller
     {
         $reward = RewardPoint::with('user')->findOrFail($id);
 
+        // if ($reward->point < 10) {
+        //     return redirect()->back()->with('error', 'Anda harus memiliki minimal 10 point untuk mencetak invoice');
+        // }
+
         // Hitung total bermain di setiap lapangan
         $totalBermain = $this->hitungTotalBermain($reward->idr);
 
@@ -49,6 +53,10 @@ class RewardPointController extends Controller
     public function downloadInvoice($id)
     {
         $reward = RewardPoint::findOrFail($id);
+
+        if ($reward->point < 10) {
+            return redirect()->back()->with('error', 'Anda harus memiliki minimal 10 point untuk mencetak invoice');
+        }
 
         // Hitung total bermain di setiap lapangan
         $totalBermain = $this->hitungTotalBermain($reward->idr);
@@ -59,3 +67,4 @@ class RewardPointController extends Controller
         return $pdf->download('invoice_' . $reward->kode_voucher . '.pdf');
     }
 }
+

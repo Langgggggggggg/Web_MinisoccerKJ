@@ -300,8 +300,8 @@
 
                 <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group">
                     <div class="h-56 bg-cover bg-center relative"
-                        style="background-image: url('{{ asset('images/rest_area.jpg') }}')">
-                        <div class="absolute inset-0 bg-black opacity-30 group-hover:opacity-20 transition duration-300">
+                        style="background-image: url('{{ asset('images/istirahat.jpg') }}')">
+                        <div class="absolute inset-0 bg-black opacity-10 group-hover:opacity-20 transition duration-300">
                         </div>
                         <div class="absolute bottom-0 left-0 p-4">
                             <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Nyaman</span>
@@ -317,8 +317,8 @@
 
                 <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group">
                     <div class="h-56 bg-cover bg-center relative"
-                        style="background-image: url('{{ asset('images/lighting.jpg') }}')">
-                        <div class="absolute inset-0 bg-black opacity-30 group-hover:opacity-20 transition duration-300">
+                        style="background-image: url('{{ asset('images/lapangmalam.jpg') }}')">
+                        <div class="absolute inset-0 bg-black opacity-10 group-hover:opacity-20 transition duration-300">
                         </div>
                         <div class="absolute bottom-0 left-0 p-4">
                             <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Modern</span>
