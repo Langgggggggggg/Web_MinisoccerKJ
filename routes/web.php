@@ -11,6 +11,7 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundAdminController;
 use  App\Http\Controllers\InformationController;
+use App\Http\Controllers\MapController;
 // ===============================
 // Rute Publik
 // ===============================
@@ -19,6 +20,13 @@ Route::get('/', function () {
 });
 Route::get('/tatacara-pemesanan', function () {
     return view('landing_page.information.tatacara-pemesanan');
+});
+// routes/web.php
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
+    Route::post('/map/update-location', [MapController::class, 'updateLocation'])->name('map.update');
 });
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');

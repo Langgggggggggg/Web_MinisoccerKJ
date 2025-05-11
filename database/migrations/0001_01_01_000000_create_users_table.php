@@ -14,12 +14,20 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('username')->unique(); 
+            $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('google_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['user', 'admin'])->default('user'); 
+            $table->enum('role', ['user', 'admin'])->default('user');
+
+            // Tambahan kolom untuk fitur Map & WhatsApp
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('whatsapp_number')->nullable();
+            $table->boolean('location_active')->default(false);
+
+
             $table->rememberToken();
             $table->timestamps();
         });
