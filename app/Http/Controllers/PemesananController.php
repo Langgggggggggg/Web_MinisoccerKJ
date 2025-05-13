@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pemesanan;
+use App\Models\Member;
 use App\Models\Jadwal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -136,6 +137,140 @@ class PemesananController extends Controller
 
             DB::commit();
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+    public function storeMember(Request $request)
+    {
+        $request->validate([
+            'tanggal' => 'required|array',
+            'tanggal.*' => 'required|date',
+            'lapangan' => 'required|string',
+            'jam_mulai' => 'required|array',
+            'jam_selesai' => 'required|array',
+            'nama_tim' => 'required|string|max:255',
+            'no_telepon' => 'required|string|max:15',
+            'dp' => 'required|numeric|min:100000',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        DB::beginTransaction();
+        try {
+            $lastTanggal = null;  // Menyimpan tanggal pemesanan terakhir
+            // Hitung total jumlah jadwal valid
+            $jumlah_jadwal_valid = 0;
+            foreach ($request->jam_mulai as $index => $mulai) {
+                $selesai = $request->jam_selesai[$index];
+                $tanggal = $request->tanggal[$index];
+                if ($mulai && $selesai && $tanggal) {
+                    $jumlah_jadwal_valid++;
+                }
+            }
+
+            // Cegah pembagian 0
+            if ($jumlah_jadwal_valid == 0) {
+                return back()->withErrors(['error' => 'Tidak ada jadwal yang valid.']);
+            }
+
+            // Hitung DP per jadwal
+            $dp_total = $request->dp;
+            $dp_per_jadwal = $dp_total / $jumlah_jadwal_valid;
+
+            foreach ($request->jam_mulai as $index => $mulai) {
+                $selesai = $request->jam_selesai[$index];
+                $tanggal = $request->tanggal[$index];
+
+                if (!$mulai || !$selesai || !$tanggal) continue;
+
+                if (strtotime($selesai) <= strtotime($mulai)) {
+                    return back()->withErrors(['error' => 'Jam selesai harus lebih besar dari jam mulai di jadwal ke-' . ($index + 1)]);
+                }
+
+                $jadwals = Jadwal::where('tanggal', $tanggal)
+                    ->where('lapangan', $request->lapangan)
+                    ->where('jam', '>=', $mulai)
+                    ->where('jam', '<', $selesai)
+                    ->get();
+
+                foreach ($jadwals as $jadwal) {
+                    if (Pemesanan::where('jadwal_id', $jadwal->id)->exists()) {
+                        return back()->withErrors(['error' => 'Jadwal ke-' . ($index + 1) . ' pada tanggal ' . $tanggal . ' sudah dipesan. Silakan pilih waktu lain.']);
+                    }
+                }
+
+                $durasi = (strtotime($selesai) - strtotime($mulai)) / 3600;
+                $total_harga = 0;
+                $jam_mulai_ts = strtotime($mulai);
+
+                for ($i = 0; $i < $durasi; $i++) {
+                    $current_time = strtotime("+$i hour", $jam_mulai_ts);
+                    $current_hour = date('H:i', $current_time);
+
+                    if ($request->lapangan >= 1 && $request->lapangan <= 3) {
+                        $harga_per_jam = ($current_hour >= '07:00' && $current_hour < '17:00') ? 300000 : 350000;
+                    } elseif ($request->lapangan >= 4 && $request->lapangan <= 5) {
+                        $harga_per_jam = ($current_hour >= '07:00' && $current_hour < '17:00') ? 400000 : 450000;
+                    } else {
+                        $harga_per_jam = 0;
+                    }
+
+                    $total_harga += $harga_per_jam;
+                }
+                $kode_pemesanan = 'MBR-' . strtoupper(substr(uniqid(), -5));
+
+                // $kode_pemesanan = strtoupper(substr(uniqid(), -5));
+
+                // Perhitungan DP & sisa bayar per entri
+                $dp = $dp_per_jadwal;
+                $sisa_bayar = max(0, $total_harga - $dp - 25000);
+                $status = ($sisa_bayar == 0) ? 'lunas' : 'belum lunas';
+
+                foreach ($jadwals as $jadwal) {
+                    $pemesanan = Pemesanan::create([
+                        'user_id' => $user->id,
+                        'kode_pemesanan' => $kode_pemesanan,
+                        'jadwal_id' => $jadwal->id,
+                        'tanggal' => $tanggal,
+                        'jam_mulai' => $mulai,
+                        'jam_selesai' => $selesai,
+                        'nama_tim' => $request->nama_tim,
+                        'no_telepon' => $request->no_telepon,
+                        'dp' => $dp,
+                        'harga' => $total_harga,
+                        'sisa_bayar' => $sisa_bayar,
+                        'status' => $status,
+                    ]);
+
+                    $lastTanggal = $tanggal;
+                }
+
+
+                // Kirim notifikasi per entri (optional)
+                NotifikasiHelper::kirimWhatsApp($pemesanan);
+            }
+
+            // Tambahkan logika untuk memasukkan data member
+            if ($lastTanggal) {
+                // Tanggal berakhir member diatur berdasarkan tanggal pemesanan terakhir
+                $tanggal_berakhir = date('Y-m-d', strtotime($lastTanggal));
+
+                // Masukkan data member
+                Member::create([
+                    'user_id' => $user->id,
+                    'status' => 'aktif',
+                    'tanggal_berakhir' => $tanggal_berakhir,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan member berhasil!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
@@ -313,7 +448,7 @@ class PemesananController extends Controller
     //         Log::error('Gagal mengirim notifikasi WhatsApp: ' . $response->body());
     //     }
     // }
-    
+
     public function getSnapToken(Request $request)
     {
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');

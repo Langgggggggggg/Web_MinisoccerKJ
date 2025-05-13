@@ -17,9 +17,10 @@
                     echo '<i class="fas fa-user-edit mr-2"></i> Profile';
                 } elseif (request()->routeIs('reward.index')) {
                     echo '<i class="fas fa-gift mr-2"></i> Reward Point';
-                } elseif (request()->routeIs('user.data-user')) {
-                    echo '<i class="fas fa-user mr-2"></i> Data Penyewa';
-
+                } elseif (request()->routeIs('map.index')) {
+                    echo '<i class="fas fa-search mr-2"></i> Cari Lawan Tanding';
+                } elseif (request()->routeIs('member.create')) {
+                    echo '<i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Member';
                     // Bagian Admin
                 } elseif (request()->routeIs('admin.dashboard')) {
                     echo '<i class="fas fa-user-shield mr-2"></i> Dashboard Pengelola';
@@ -31,8 +32,8 @@
                     echo '<i class="fas fa-gift mr-2"></i> Perolehan Reward Point';
                 } elseif (request()->routeIs('admin.konfirmasi-penukaran-poin')) {
                     echo '<i class="fas fa-gift mr-2"></i> Penukaran Poin';
-                } elseif (request()->routeIs('admin.data-admin')) {
-                    echo '<i class="fas fa-user-cog mr-2"></i> Data Pengelola';
+                } elseif (request()->routeIs('admin.data-member')) {
+                    echo '<i class="fas fa-users mr-2"></i> Data Member';
                 } elseif (request()->routeIs('admin.edit')) {
                     echo '<i class="fas fa-user-edit mr-2"></i> Edit Profil Admin';
                 } elseif (request()->routeIs('admin.create')) {

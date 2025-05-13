@@ -49,6 +49,10 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.refund.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Refund
                 </a>
+                <a href="{{ route('map.index') }}"
+                    class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('map.index') ? 'bg-emerald-600' : '' }}">
+                    <i class="fas fa-search w-5 h-5 mr-2"></i> Cari lawan tanding
+                </a>
             @endif
 
             @if (Auth::user()->role === 'admin')
@@ -76,6 +80,10 @@
                         <a href="{{ route('admin.reward-points') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.reward-points') ? 'bg-emerald-600' : '' }}">
                             <i class="fas fa-gift w-5 h-5 mr-2"></i> Data Reward Point
+                        </a>
+                        <a href="{{ route('admin.data-member') }}"
+                            class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.data-member') ? 'bg-emerald-600' : '' }}">
+                            <i class="fas fa-users w-5 h-5 mr-2"></i> Data Member
                         </a>
                         {{-- <a href="{{ route('admin.data-admin') }}"
                             class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.data-admin') ? 'bg-emerald-600' : '' }}">

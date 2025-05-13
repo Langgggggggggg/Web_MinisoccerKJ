@@ -12,6 +12,7 @@ use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundAdminController;
 use  App\Http\Controllers\InformationController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\PenawaranMemberController;
 // ===============================
 // Rute Publik
 // ===============================
@@ -34,9 +35,16 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 // ===============================
 // Dashboard (Autentikasi + Verifikasi)
 // ===============================
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [PenawaranMemberController::class, 'index'])->name('dashboard');
+    Route::get('/member/create', function () {
+        return view('member.create');
+    })->name('member.create');
+    Route::post('/pemesanan/member', [PemesananController::class, 'storeMember'])->name('pemesanan.storeMember');
+});
+
+
+
 
 // ===============================
 // Manajemen Profil (Autentikasi)
@@ -124,6 +132,8 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::post('/admin/tambah-admin', [AdminController::class, 'storeAdmin'])->name('admin.store');
     Route::put('/admin/{id}/update', [AdminController::class, 'update'])->name('admin.update');
 
+    //Menampilkan data member
+    Route::get('/admin/data-member', [AdminController::class, 'dataMember'])->name('admin.data-member');
     // Pemesanan oleh Admin
     Route::get('/admin/pemesanan/create', [AdminController::class, 'createPemesanan'])->name('admin.pemesanan.create');
     Route::post('/admin/pemesanan/store', [AdminController::class, 'storePemesanan'])->name('admin.pemesanan.store');
