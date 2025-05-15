@@ -64,4 +64,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Member::class);
     }
+    public function tanding()
+    {
+        return $this->hasOne(Tanding::class);
+    }
 }

@@ -21,12 +21,6 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['user', 'admin'])->default('user');
 
-            // Tambahan kolom untuk fitur Map & WhatsApp
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
-            $table->string('whatsapp_number')->nullable();
-            $table->boolean('location_active')->default(false);
-
 
             $table->rememberToken();
             $table->timestamps();
