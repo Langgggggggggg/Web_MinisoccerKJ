@@ -180,12 +180,13 @@ class AdminController extends Controller
                 'kode_voucher' => $kode_voucher,
             ]);
         }
-
+        
         // === CATAT KE TABEL KEUANGAN (PAKAI TANGGAL JADWAL MAIN, BUKAN now()) ===
         $tanggal_main = $pemesanan->jadwal->tanggal; // pastikan relasi jadwal ada
         $bulan_main = date('Y-m', strtotime($tanggal_main));
-
+        
         Keuangan::create([
+            'pemesanan_id' => $pemesanan->id,
             'tanggal' => $tanggal_main,
             'bulan' => $bulan_main,
             'jumlah' => $total_pembayaran,

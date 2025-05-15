@@ -39,4 +39,8 @@ class Pemesanan extends Model
     {
         return $this->hasMany(Refund::class);
     }
+    public function pemesanan()
+    {
+        return $this->belongsTo(Pemesanan::class);
+    }
 }

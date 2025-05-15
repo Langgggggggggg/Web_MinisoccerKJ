@@ -10,12 +10,17 @@ class CreateKeuanganTable extends Migration
     {
         Schema::create('keuangan', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal');             // Tanggal transaksi
-            $table->string('bulan', 20);           // Format Nama bulan (contoh: April)
-            $table->bigInteger('jumlah');         // Jumlah uang masuk
+            $table->unsignedBigInteger('pemesanan_id'); // foreign key ke tabel pemesanan
+            $table->date('tanggal');
+            $table->string('bulan', 20);
+            $table->bigInteger('jumlah');
             $table->timestamps();
+
+            // Definisi foreign key
+            $table->foreign('pemesanan_id')->references('id')->on('pemesanan')->onDelete('cascade');
         });
     }
+
 
     public function down()
     {

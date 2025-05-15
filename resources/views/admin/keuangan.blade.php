@@ -1,9 +1,7 @@
 @extends('layouts.app')
-
 @section('header')
     @include('layouts.header')
 @endsection
-
 @section('content')
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
@@ -13,7 +11,6 @@
                 <span class="bg-blue-100 text-blue-800 font-medium py-1 px-3 rounded-full">{{ now()->format('d F Y') }}</span>
             </div>
         </div>
-
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Daily Stats -->
@@ -30,7 +27,6 @@
                     <p class="text-sm text-gray-600 mt-1">{{ now()->format('d F Y') }}</p>
                 </div>
             </div>
-
             <!-- Weekly Stats -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="bg-blue-500 px-6 py-3">
@@ -48,7 +44,6 @@
                     </p>
                 </div>
             </div>
-
             <!-- Monthly Stats -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="bg-purple-500 px-6 py-3">
@@ -66,7 +61,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Filter Section -->
         <div class="bg-white rounded-lg shadow mb-8">
             <div class="border-b border-gray-200 px-6 py-4">
@@ -98,7 +92,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Chart Section -->
         <div class="bg-white rounded-lg shadow mb-8">
             <div class="border-b border-gray-200 px-6 py-4">
@@ -166,6 +159,7 @@
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Transaksi</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Tim</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -176,10 +170,13 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         Rp {{ number_format($period['total'], 0, ',', '.') }}
                                     </td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">
+                                        {{ $period['tim_info'] ?? 'Tidak ada tim' }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">
                                         Tidak ada data untuk periode yang dipilih
                                     </td>
                                 </tr>
@@ -194,6 +191,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                                     Rp {{ number_format($totalPendapatanBulanIni, 0, ',', '.') }}
                                 </td>
+                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -201,7 +199,6 @@
             </div>
         </div>
     </div>
-
     <!-- JavaScript for filtering and charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
     <script>
@@ -210,7 +207,6 @@
             const viewType = document.getElementById('view_type').value;
             window.location.href = `{{ route('admin.keuangan') }}?bulan=${bulan}&view_type=${viewType}`;
         }
-
         // Chart rendering
         document.addEventListener('DOMContentLoaded', function() {
             const chartData = @json($chartData);
@@ -252,7 +248,6 @@
                     }
                 }
             };
-
             const chart = new ApexCharts(document.querySelector("#keuangan-chart"), options);
             chart.render();
         });

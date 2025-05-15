@@ -12,8 +12,13 @@ class Keuangan extends Model
     protected $table = 'keuangan';
 
     protected $fillable = [
+        'pemesanan_id',
         'tanggal',
         'bulan',
         'jumlah',
     ];
+    public function pemesanan()
+    {
+        return $this->belongsTo(Pemesanan::class);
+    }
 }

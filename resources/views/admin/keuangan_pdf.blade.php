@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>{{ $title }}</title>
@@ -12,72 +13,73 @@
             line-height: 1.5;
             color: #333;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .header h1 {
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 5px;
         }
-        
+
         .header p {
             font-size: 12px;
             color: #666;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px 12px;
             text-align: left;
         }
-        
+
         th {
             background-color: #f5f5f5;
             font-weight: bold;
         }
-        
+
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        
+
         .footer {
             margin-top: 30px;
             font-size: 10px;
             color: #666;
             text-align: center;
         }
-        
+
         .summary {
             margin: 20px 0;
             padding: 15px;
             background-color: #f5f5f5;
             border-radius: 5px;
         }
-        
+
         .summary-title {
             font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         .summary-value {
             font-size: 16px;
             font-weight: bold;
         }
-        
+
         .page-break {
             page-break-after: always;
         }
-        
+
         .watermark {
             position: absolute;
             top: 50%;
@@ -89,24 +91,25 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Watermark (optional) -->
     <div class="watermark">LAPORAN KEUANGAN</div>
-    
+
     <!-- Header -->
     <div class="header">
         <h1>{{ $title }}</h1>
         <p>Dicetak pada: {{ $tanggalCetak }}</p>
     </div>
-    
+
     <!-- Summary -->
     <div class="summary">
         <div class="summary-title">Total Pendapatan:</div>
         <div class="summary-value">Rp {{ number_format($totalPendapatanBulanIni, 0, ',', '.') }}</div>
         <p>Periode: {{ \Carbon\Carbon::parse($bulan)->format('F Y') }}</p>
         <p>
-            Jenis Laporan: 
-            @if($view_type == 'daily')
+            Jenis Laporan:
+            @if ($view_type == 'daily')
                 Harian
             @elseif($view_type == 'weekly')
                 Mingguan
@@ -115,14 +118,14 @@
             @endif
         </p>
     </div>
-    
+
     <!-- Table Data -->
     <table>
         <thead>
             <tr>
-                <th style="width: 10%;">No</th>
-                <th style="width: 40%;">
-                    @if($view_type == 'daily')
+                <th style="width: 5%;">No</th>
+                <th style="width: 25%;">
+                    @if ($view_type == 'daily')
                         Tanggal
                     @elseif($view_type == 'weekly')
                         Periode Minggu
@@ -130,8 +133,9 @@
                         Bulan
                     @endif
                 </th>
-                <th style="width: 20%;">Jumlah Transaksi</th>
-                <th style="width: 30%;">Total (Rp)</th>
+                <th style="width: 15%;">Jumlah Transaksi</th>
+                <th style="width: 20%;">Total (Rp)</th>
+                <th style="width: 35%;">Nama_Tim</th>
             </tr>
         </thead>
         <tbody>
@@ -141,10 +145,11 @@
                     <td>{{ $period['date'] }}</td>
                     <td>{{ $period['count'] }}</td>
                     <td>{{ number_format($period['total'], 0, ',', '.') }}</td>
+                    <td>{{ $period['tim_info'] }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" style="text-align: center;">Tidak ada data untuk periode yang dipilih</td>
+                    <td colspan="5" style="text-align: center;">Tidak ada data untuk periode yang dipilih</td>
                 </tr>
             @endforelse
         </tbody>
@@ -153,14 +158,17 @@
                 <td colspan="2" style="font-weight: bold;">Total</td>
                 <td style="font-weight: bold;">{{ $groupedData->sum('count') }}</td>
                 <td style="font-weight: bold;">{{ number_format($totalPendapatanBulanIni, 0, ',', '.') }}</td>
+                <td></td>
             </tr>
         </tfoot>
     </table>
-    
+
+
     <!-- Footer -->
     <div class="footer">
         <p>Dokumen ini dihasilkan secara otomatis dan tidak memerlukan tanda tangan.</p>
         <p>&copy; {{ date('Y') }} Sistem Keuangan. Semua hak dilindungi.</p>
     </div>
 </body>
+
 </html>
