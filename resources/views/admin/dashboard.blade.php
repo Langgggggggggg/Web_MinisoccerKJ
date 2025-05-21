@@ -21,21 +21,6 @@
                     Lihat data <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
-{{-- 
-            <!-- Total Admin -->
-            <div class="p-4 bg-green-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-lg font-semibold">Total Pengelola</h2>
-                        <p class="text-3xl font-bold">{{ $totalAdmin }}</p>
-                    </div>
-                    <i class="fas fa-user-shield text-4xl mr-4"></i>
-                </div>
-                <a href="{{ route('admin.data-admin') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
-                    Lihat data <i class="fas fa-arrow-right ml-1"></i>
-                </a>
-            </div> --}}
-
             <!-- Total Pemesanan Belum Lunas -->
             <div class="p-4 bg-red-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
@@ -59,21 +44,21 @@
                     </div>
                     <i class="fas fa-money-bill-wave text-4xl mr-4"></i>
                 </div>
-                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                <a href="{{ route('admin.keuangan') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat detail <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
 
-            <!-- Total Pendapatan Keseluruhan -->
+            <!-- Total Pendapatan Minggu ini -->
             <div class="p-4 bg-teal-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-lg font-semibold">Pendapatan Keseluruhan</h2>
-                        <p class="text-3xl font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                        <h2 class="text-lg font-semibold">Pendapatan Minggu Ini</h2>
+                        <p class="text-3xl font-bold">Rp {{ number_format($pendapatanMingguIni, 0, ',', '.') }}</p>
                     </div>
                     <i class="fas fa-wallet text-4xl mr-4"></i>
                 </div>
-                <a href="#" class="mt-4 block text-white text-sm font-semibold underline items-center">
+                <a href="{{ route('admin.keuangan') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat detail <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>

@@ -37,8 +37,9 @@ class AdminController extends Controller
         $pendapatanBulanIni = Keuangan::where('bulan', Carbon::now()->format('Y-m'))
             ->sum('jumlah');
 
-        // Menghitung total pendapatan keseluruhan
-        $totalPendapatan = Keuangan::sum('jumlah');
+        // Menghitung total pendapatan minggu ini
+        $pendapatanMingguIni = Keuangan::whereBetween('tanggal', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->sum('jumlah');
 
         // Menghitung total pengajuan refund
         $totalPengajuanRefund = Refund::where('status', 'diajukan')->count();
@@ -49,7 +50,7 @@ class AdminController extends Controller
             'totalAdmin',
             'totalBelumLunas',
             'pendapatanBulanIni',
-            'totalPendapatan',
+            'pendapatanMingguIni',
             'totalPengajuanRefund'
         ));
     }
@@ -193,7 +194,14 @@ class AdminController extends Controller
             // 'keterangan' => 'Pelunasan kode pemesanan: ' . $pemesanan->kode_pemesanan,
         ]);
 
-        return redirect()->route('admin.konfirmasi-pelunasan')->with('success', 'Pelunasan berhasil dikonfirmasi. Reward point telah ditambahkan dan keuangan tercatat.');
+        // === LOGIKA MBR ===
+        if (substr($pemesanan->kode_pemesanan, 0, 3) == "MBR") {
+            $pesan_sukses = 'Pelunasan berhasil dikonfirmasi. Tim ini terdaftar sebagai member dan berhak mendapatkan potongan sebesar Rp 25.000 dari sisa pelunasan.';
+        } else {
+            $pesan_sukses = 'Pelunasan berhasil dikonfirmasi. Reward point telah ditambahkan dan keuangan tercatat.';
+        }
+
+        return redirect()->route('admin.konfirmasi-pelunasan')->with('success', $pesan_sukses);
     }
     public function konfirmasiPenukaranPoin(Request $request)
     {

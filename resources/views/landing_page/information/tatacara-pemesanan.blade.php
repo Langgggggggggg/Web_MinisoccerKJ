@@ -33,8 +33,8 @@
                         </div>
                     </div>
                     
-                    <!-- Right Image (Even steps) -->
-                    <div class="hidden lg:block lg:pl-10">
+                    <!-- Right Image (Now visible on mobile too) -->
+                    <div class="mb-4 lg:mb-0 lg:pl-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
                             <img src="{{ asset('images/register.png') }}" alt="Pilih Produk" class="w-full h-full object-cover">
                         </div>
@@ -48,8 +48,8 @@
                         <div class="bg-rose-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-md">2</div>
                     </div>
                     
-                    <!-- Left Image (Odd steps) -->
-                    <div class="hidden lg:block lg:pr-10">
+                    <!-- Left Image (Now visible on mobile too) -->
+                    <div class="mb-4 lg:mb-0 lg:pr-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
                             <img src="{{ asset('images/jadwal.png') }}" alt="Buka Menu Jadwal" class="w-full h-full object-cover">
                         </div>
@@ -97,8 +97,8 @@
                         </div>
                     </div>
                     
-                    <!-- Right Image (Even steps) -->
-                    <div class="hidden lg:block lg:pl-10">
+                    <!-- Right Image (Now visible on mobile too) -->
+                    <div class="mb-4 lg:mb-0 lg:pl-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
                             <img src="{{ asset('images/form_pemesanan.png') }}" alt="Lengkapi Data" class="w-full h-full object-cover">
                         </div>
@@ -112,8 +112,8 @@
                         <div class="bg-rose-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-md">4</div>
                     </div>
                     
-                    <!-- Left Image (Odd steps) -->
-                    <div class="hidden lg:block lg:pr-10">
+                    <!-- Left Image (Now visible on mobile too) -->
+                    <div class="mb-4 lg:mb-0 lg:pr-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
                             <img src="{{ asset('images/metode_pembayaran.png') }}" alt="Pilih Metode Pembayaran" class="w-full h-full object-cover">
                         </div>
@@ -158,8 +158,8 @@
                         </div>
                     </div>
                     
-                    <!-- Right Image (Even steps) -->
-                    <div class="hidden lg:block lg:pl-10">
+                    <!-- Right Image (Now visible on mobile too) -->
+                    <div class="mb-4 lg:mb-0 lg:pl-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
                             <img src="{{ asset('images/pemesanan_selesai.png') }}" alt="Konfirmasi Pesanan" class="w-full h-full object-cover">
                         </div>
@@ -167,50 +167,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Additional Information -->
-        <div class="mt-20">
-            <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Tracking Info -->
-                    <div class="text-center">
-                        <div class="bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Lacak Pesanan</h3>
-                        <p class="text-gray-600">Pantau status pesanan Anda secara real-time melalui sistem pelacakan kami.</p>
-                        <a href="#" class="mt-3 inline-block text-rose-600 font-medium hover:text-rose-700">Cek Status</a>
-                    </div>
-
-                    <!-- Customer Support -->
-                    <div class="text-center">
-                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Layanan Pelanggan</h3>
-                        <p class="text-gray-600">Tim kami siap membantu Anda dengan pertanyaan seputar pemesanan dan produk.</p>
-                        <a href="#" class="mt-3 inline-block text-blue-600 font-medium hover:text-blue-700">Hubungi Kami</a>
-                    </div>
-
-                    <!-- FAQ -->
-                    <div class="text-center">
-                        <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">FAQ</h3>
-                        <p class="text-gray-600">Temukan jawaban atas pertanyaan umum seputar proses pemesanan dan pengiriman.</p>
-                        <a href="#" class="mt-3 inline-block text-green-600 font-medium hover:text-green-700">Lihat FAQ</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- CTA Section -->
         <div class="mt-16 text-center">
             <h2 class="text-2xl md:text-3xl font-bold text-green-900 mb-6">Siap untuk memesan lapangan?</h2>

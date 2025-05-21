@@ -13,8 +13,7 @@
                             <span class="block">Minisoccer</span>
                             <span class="text-green-400">Kramat Jaya</span>
                         </h1>
-                        <p class="text-xl text-gray-200 mt-4 mb-8">Lapangan berkualitas premium untuk pengalaman bermain
-                            sepak bola terbaik Anda</p>
+                        <p class="text-xl text-gray-200 mt-4 mb-8">Nikmati pengalaman bermain di 5 lapangan minisoccer yang memiliki rumput sintetis berkualitas tinggi</p>
                         <div class="flex flex-wrap gap-4">
                             <a href="{{ route('login') }}"
                                 class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg flex items-center">

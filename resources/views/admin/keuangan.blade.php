@@ -3,14 +3,7 @@
     @include('layouts.header')
 @endsection
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Data Keuangan</h1>
-            <div class="text-sm text-gray-500">
-                <span class="bg-blue-100 text-blue-800 font-medium py-1 px-3 rounded-full">{{ now()->format('d F Y') }}</span>
-            </div>
-        </div>
+    <div class="container mx-auto px-4">
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Daily Stats -->

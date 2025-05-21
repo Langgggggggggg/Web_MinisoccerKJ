@@ -4,7 +4,7 @@
             @php
                 // Bagian Pemesanan / User
                 if (request()->routeIs('dashboard')) {
-                    echo '<i class="fas fa-home mr-2"></i> Home';
+                    echo '<i class="fas fa-user mr-2"></i> Dashboard Penyewa';
                 } elseif (request()->routeIs('jadwal.index')) {
                     echo '<i class="fas fa-calendar-alt mr-2"></i> Jadwal';
                 } elseif (request()->routeIs('pemesanan.detail')) {
@@ -47,7 +47,9 @@
                 } elseif (request()->routeIs('admin.refunds.index')) {
                     echo '<i class="fas fa-file-alt mr-2"></i> Data Refund';
                 } elseif (request()->routeIs('admin.refunds.show')) {
-                    echo '<i class="fas fa-file-alt mr-2"></i> Detail Refund';                    // Default jika tidak sesuai rute manapun
+                    echo '<i class="fas fa-file-alt mr-2"></i> Detail Refund'; // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('admin.keuangan')) {
+                    echo '<i class="fas fa-money-bill-wave mr-2"></i> Data Keuangan'; // Default jika tidak sesuai rute manapun
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }

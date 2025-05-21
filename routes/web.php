@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\KeuanganController;
@@ -35,17 +36,6 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 // ===============================
 // Dashboard (Autentikasi + Verifikasi)
 // ===============================
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [PenawaranMemberController::class, 'index'])->name('dashboard');
-    Route::get('/member/create', function () {
-        return view('member.create');
-    })->name('member.create');
-    Route::post('/pemesanan/member', [PemesananController::class, 'storeMember'])->name('pemesanan.storeMember');
-});
-
-
-
-
 // ===============================
 // Manajemen Profil (Autentikasi)
 // ===============================
@@ -53,14 +43,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-;
+});;
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/refund', [RefundController::class, 'index'])->name('refunds.index');
-    Route::get('/refunds/create/{pemesanan_id}', [RefundController::class, 'create'])->name('refunds.create');
-    Route::post('/refunds', [RefundController::class, 'store'])->name('refunds.store');
-});
+Route::middleware(['auth'])->group(function () {});
 Route::get('/informasi', [InformationController::class, 'publicIndex'])->name('landing.information.index');
 // Halaman informasi detail publik
 Route::get('/informasi/{slug}', [InformationController::class, 'show'])->name('information.show');
@@ -74,7 +59,8 @@ Route::middleware('auth')->group(function () {
 // ===============================
 // Pemesanan (Autentikasi)
 // ===============================
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\UserMiddleware::class])->group(function () {
+    // Pemesanan
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan/store', [PemesananController::class, 'store'])->name('pemesanan.store');
     Route::get('/pemesanan/detail', [PemesananController::class, 'index'])->name('pemesanan.detail');
@@ -82,16 +68,22 @@ Route::middleware('auth')->group(function () {
     Route::put('/pemesanan/{kode_pemesanan}', [PemesananController::class, 'update'])->name('pemesanan.update');
     Route::post('/pemesanan/validateSchedule', [PemesananController::class, 'validateSchedule']);
     Route::post('/pemesanan/getSnapToken', [PemesananController::class, 'getSnapToken'])->name('pemesanan.getSnapToken');
-});
 
-// ===============================
-// Reward Points (Autentikasi)
-// ===============================
-Route::middleware('auth')->group(function () {
+    // Reward Points
     Route::get('/reward-points', [RewardPointController::class, 'index'])->name('reward.index');
     Route::get('/reward-points/invoice/{id}', [RewardPointController::class, 'invoice'])->name('reward.invoice');
     Route::get('/reward-points/{id}/invoice', [RewardPointController::class, 'downloadInvoice'])->name('reward.download-invoice');
+    Route::get('/dashboard', [PenawaranMemberController::class, 'index'])->name('dashboard');
+    Route::get('/member/create', [PenawaranMemberController::class, 'create'])
+        ->name('member.create')
+        ->middleware('signed');
+    Route::post('/pemesanan/member', [PemesananController::class, 'storeMember'])->name('pemesanan.storeMember');
+
+    Route::get('/refund', [RefundController::class, 'index'])->name('refunds.index');
+    Route::get('/refunds/create/{pemesanan_id}', [RefundController::class, 'create'])->name('refunds.create');
+    Route::post('/refunds', [RefundController::class, 'store'])->name('refunds.store');
 });
+
 
 // ===============================
 // Admin (Autentikasi)
@@ -117,7 +109,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     // Data Pemesanan dan Reward
     Route::get('/admin/pemesanan', [AdminController::class, 'dataPemesanan'])->name('admin.data-pemesanan');
     Route::get('/admin/reward-points', [AdminController::class, 'dataRewardPoint'])->name('admin.reward-points');
-    
+
     // Route untuk pengelolaan keuangan
     Route::get('/admin/keuangan', [KeuanganController::class, 'dataKeuangan'])->name('admin.keuangan');
     Route::get('/admin/keuangan/export', [KeuanganController::class, 'exportKeuanganPDF'])->name('admin.keuangan.export');
@@ -140,20 +132,20 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::get('/admin/pemesanan/{id}/edit', [AdminController::class, 'editPemesanan'])->name('admin.editPemesanan');
     Route::post('/admin/pemesanan/{id}/update', [AdminController::class, 'updatePemesanan'])->name('admin.updatePemesanan');
     Route::delete('/admin/pemesanan/{id}/hapus', [AdminController::class, 'hapusPemesanan'])->name('admin.pemesanan.hapus');
-    
+
 
     // Pengajuan Refund
     Route::get('/admin/refund', [RefundAdminController::class, 'index'])->name('admin.refunds.index');
     Route::get('/refund/{id}', [RefundAdminController::class, 'show'])->name('admin.refunds.show');
     Route::post('/refund/{id}/approve', [RefundAdminController::class, 'approve'])->name('admin.refunds.approve');
     Route::post('/refund/{id}/reject', [RefundAdminController::class, 'reject'])->name('admin.refunds.reject');
-     // CRUD Informasi (Admin)
-     Route::get('/admin/information', [InformationController::class, 'index'])->name('admin.information.index');
-     Route::get('/admin/information/create', [InformationController::class, 'create'])->name('admin.information.create');
-     Route::post('/admin/information', [InformationController::class, 'store'])->name('admin.information.store');
-     Route::get('/admin/information/{information}/edit', [InformationController::class, 'edit'])->name('admin.information.edit');
-     Route::put('/admin/information/{information}', [InformationController::class, 'update'])->name('admin.information.update');
-     Route::delete('/admin/information/{information}', [InformationController::class, 'destroy'])->name('admin.information.destroy');
+    // CRUD Informasi (Admin)
+    Route::get('/admin/information', [InformationController::class, 'index'])->name('admin.information.index');
+    Route::get('/admin/information/create', [InformationController::class, 'create'])->name('admin.information.create');
+    Route::post('/admin/information', [InformationController::class, 'store'])->name('admin.information.store');
+    Route::get('/admin/information/{information}/edit', [InformationController::class, 'edit'])->name('admin.information.edit');
+    Route::put('/admin/information/{information}', [InformationController::class, 'update'])->name('admin.information.update');
+    Route::delete('/admin/information/{information}', [InformationController::class, 'destroy'])->name('admin.information.destroy');
 });
 
 

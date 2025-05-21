@@ -6,12 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pemesanan;
 use App\Models\Member;
+use App\Models\RewardPoint;
 use Carbon\Carbon;
 
 class PenawaranMemberController extends Controller
 {
     public function index()
     {
+        $idr = RewardPoint::where('user_id', Auth::id())->sum('idr');
+        // Hitung jumlah pemesanan yang akan datang (tanggal lebih besar dari hari ini dan status belum lunas)
+        $jumlahPemesananMendatang = Pemesanan::where('user_id', Auth::id())
+            ->where('tanggal', '>', Carbon::now())
+            ->where('status', '!=', 'lunas')
+            ->count();
+        $memberStatus = Member::where('user_id', Auth::id())->latest()->value('status') ?? 'non-aktif';
+
         $user = Auth::user();
 
         // Hitung jumlah pemesanan yang berhasil (status 'lunas')
@@ -20,7 +29,7 @@ class PenawaranMemberController extends Controller
             ->count();
 
         // Ambil data member jika ada
-       $member = Member::where('user_id', $user->id)->latest()->first();
+        $member = Member::where('user_id', $user->id)->latest()->first();
 
 
         // Inisialisasi penawaran
@@ -53,7 +62,10 @@ class PenawaranMemberController extends Controller
             'bookingCount',
             'showMembershipOffer',
             'showRenewalOffer',
-            'member'
+            'member',
+            'idr',
+            'jumlahPemesananMendatang',
+            'memberStatus',
         ));
     }
 }
