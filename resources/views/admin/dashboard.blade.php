@@ -8,7 +8,7 @@
     <div class="container mx-auto px-4">
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Total Users -->
+            {{-- <!-- Total Users -->
             <div class="p-4 bg-blue-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">
                     <div>
@@ -20,7 +20,7 @@
                 <a href="{{ route('user.data-user') }}" class="mt-4 block text-white text-sm font-semibold underline items-center">
                     Lihat data <i class="fas fa-arrow-right ml-1"></i>
                 </a>
-            </div>
+            </div> --}}
             <!-- Total Pemesanan Belum Lunas -->
             <div class="p-4 bg-red-500 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                 <div class="flex justify-between items-center">

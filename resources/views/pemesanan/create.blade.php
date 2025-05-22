@@ -92,12 +92,16 @@
 
                     </div>
 
-                    <div class="mb-6">
+                    <div class="mb-6 flex justify-end space-x-2">
                         <button type="button"
-                            class="w-full bg-emerald-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+                            class="bg-emerald-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
                             onclick="processPayment()">
-                            <i class="fas fa-check-circle mr-2"></i> Pesan
+                            <i class="fas fa-credit-card mr-2"></i> Pesan
                         </button>
+                        <a href="{{ route('dashboard') }}"
+                            class="bg-gray-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                            <i class="fas fa-arrow-left mr-2"></i> Kembali
+                        </a>
                     </div>
                 </form>
             </div>

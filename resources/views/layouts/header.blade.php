@@ -43,9 +43,9 @@
                 } elseif (request()->routeIs('refunds.create')) {
                     echo '<i class="fas fa-file-alt mr-2"></i> Ajukan Refund';
                 } elseif (request()->routeIs('refunds.index')) {
-                    echo '<i class="fas fa-file-alt mr-2"></i> Data Refund';
+                    echo '<i class="fas fa-money-bill-wave mr-2"></i> Data Refund';
                 } elseif (request()->routeIs('admin.refunds.index')) {
-                    echo '<i class="fas fa-file-alt mr-2"></i> Data Refund';
+                    echo '<i class="fas fa-money-bill-wave mr-2"></i> Data Refund';
                 } elseif (request()->routeIs('admin.refunds.show')) {
                     echo '<i class="fas fa-file-alt mr-2"></i> Detail Refund'; // Default jika tidak sesuai rute manapun
                 } elseif (request()->routeIs('admin.keuangan')) {
