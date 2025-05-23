@@ -50,6 +50,14 @@
                     echo '<i class="fas fa-file-alt mr-2"></i> Detail Refund'; // Default jika tidak sesuai rute manapun
                 } elseif (request()->routeIs('admin.keuangan')) {
                     echo '<i class="fas fa-money-bill-wave mr-2"></i> Data Keuangan'; // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('admin.information.index')) {
+                    echo '<i class="fas fa-info-circle mr-2"></i> Informasi'; // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('admin.information.create')) {
+                    echo '<i class="fas fa-newspaper mr-2"></i> Tambah Informasi'; // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('admin.information.edit')) {
+                    echo '<i class="fas fa-edit mr-2"></i> Edit Informasi'; // Default jika tidak sesuai rute manapun
+                } elseif (request()->routeIs('admin.pemesanan.create')) {
+                    echo '<i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Lapangan (Pengelola)'; // Default jika tidak sesuai rute manapun
                 } else {
                     echo '<i class="fas fa-futbol mr-2"></i> Mini Soccer Kramat Jaya';
                 }

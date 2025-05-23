@@ -68,4 +68,8 @@ class PenawaranMemberController extends Controller
             'memberStatus',
         ));
     }
+    public function create()
+    {
+        return view('member.create');
+    }
 }

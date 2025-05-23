@@ -83,10 +83,13 @@
                 </div>
                 
                 <!-- Tombol Submit -->
-                <div class="flex justify-end">
+                <div class="flex justify-end space-x-2">
                     <button type="button" onclick="prosesPembayaranMember()" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
                         Pesan Sekarang
                     </button>
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+                        Kembali
+                    </a>
                 </div>
             </form>
         </div>

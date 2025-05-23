@@ -9,7 +9,7 @@
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="bg-emerald-600 text-white p-3">
             <h2 class="text-2xl font-semibold">
-                <i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Lapangan (Admin)
+                <i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Lapangan (Pengelola)
             </h2>
         </div>
         <div class="p-6">
@@ -109,11 +109,15 @@
                     @error('dp') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="mb-6">
+                <div class="flex justify-end space-x-4">
                     <button type="submit"
-                        class="w-full bg-emerald-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                        class="bg-emerald-600 text-white py-2 px-2 rounded-md shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
                         <i class="fas fa-check-circle mr-2"></i> Simpan Pemesanan
                     </button>
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-2 rounded-md shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Kembali
+                    </a>
                 </div>
             </form>
         </div>

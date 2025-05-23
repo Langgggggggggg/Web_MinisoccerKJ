@@ -22,7 +22,7 @@
                 </div>
 
                 <input type="text" id="searchInput" placeholder="Cari.."
-                    class="p-2 border rounded-md text-sm w-full md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    class="p-2 border rounded-md text-sm w-full md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">   
             </div>
 
             <table class="table-auto w-full text-center text-sm text-gray-700">

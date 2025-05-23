@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\URL;
+// use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\KeuanganController;
@@ -76,7 +76,7 @@ Route::middleware(['auth', \App\Http\Middleware\UserMiddleware::class])->group(f
     Route::get('/dashboard', [PenawaranMemberController::class, 'index'])->name('dashboard');
     Route::get('/member/create', [PenawaranMemberController::class, 'create'])
         ->name('member.create')
-        ->middleware('signed');
+        ;
     Route::post('/pemesanan/member', [PemesananController::class, 'storeMember'])->name('pemesanan.storeMember');
 
     Route::get('/refund', [RefundController::class, 'index'])->name('refunds.index');
