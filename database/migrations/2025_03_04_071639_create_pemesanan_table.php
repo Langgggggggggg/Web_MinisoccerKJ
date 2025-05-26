@@ -11,7 +11,7 @@ class CreatePemesananTable extends Migration
     Schema::create('pemesanan', function (Blueprint $table) {
         $table->id();
         $table->unsignedBigInteger('user_id'); // Foreign key ke users
-        $table->unsignedBigInteger('jadwal_id'); // Foreign key ke jadwal
+        $table->unsignedBigInteger('jadwal_id')->nullable(); // Foreign key ke jadwal
         $table->string('kode_pemesanan');
         $table->date('tanggal'); 
         $table->time('jam_mulai'); 
@@ -22,6 +22,8 @@ class CreatePemesananTable extends Migration
         $table->integer('harga'); 
         $table->enum('status', ['lunas', 'belum lunas'])->nullable()->default(null);
         $table->integer('sisa_bayar')->nullable();
+        $table->integer('lapangan');
+        
 
         $table->timestamps();
 

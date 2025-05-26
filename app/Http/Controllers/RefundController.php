@@ -50,7 +50,7 @@ class RefundController extends Controller
             'alasan' => 'required|string|max:255'
         ]);
 
-        $pemesanan = Pemesanan::with('jadwal')->findOrFail($request->pemesanan_id);
+        $pemesanan = Pemesanan::findOrFail($request->pemesanan_id);
 
         if ($pemesanan->user_id !== Auth::id()) {
             abort(403);
@@ -58,8 +58,8 @@ class RefundController extends Controller
 
         // Ambil data yang disalin
         $kodePemesanan = $pemesanan->kode_pemesanan;
-        $lapangan = $pemesanan->jadwal->lapangan ?? '-';
-        $tanggal = $pemesanan->jadwal->tanggal ?? '-';
+        $lapangan = $pemesanan->lapangan;
+        $tanggal = $pemesanan->tanggal;
         $jamBermain = $pemesanan->jam_mulai . ' - ' . $pemesanan->jam_selesai;
         $dp = $pemesanan->dp;
 

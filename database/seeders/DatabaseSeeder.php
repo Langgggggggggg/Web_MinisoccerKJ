@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User; // Pastikan ini ada jika Anda menggunakan User Seeder
 use Database\Seeders\AdminSeeder; // Import AdminSeeder
-use Database\Seeders\JadwalSeeder; // Import JadwalSeeder
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,7 +16,5 @@ class DatabaseSeeder extends Seeder
         // Menjalankan AdminSeeder
         $this->call(AdminSeeder::class);
 
-        // Menjalankan JadwalSeeder
-        $this->call(JadwalSeeder::class);
     }
 }

@@ -28,11 +28,11 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Lapangan</p>
-                            <p class="text-base font-semibold text-gray-800">{{ $pemesanan->jadwal->lapangan }}</p>
+                            <p class="text-base font-semibold text-gray-800">{{ $pemesanan->lapangan }}</p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Tanggal</p>
-                            <p class="text-base font-semibold text-gray-800">{{ $pemesanan->jadwal->tanggal }}</p>
+                            <p class="text-base font-semibold text-gray-800">{{ $pemesanan->tanggal }}</p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Jam Bermain</p>

@@ -18,6 +18,7 @@ class Pemesanan extends Model
         'tanggal',
         'jam_mulai',
         'jam_selesai',
+        'lapangan',
         'nama_tim',
         'no_telepon',
         'dp',
@@ -26,11 +27,6 @@ class Pemesanan extends Model
         'sisa_bayar',
     ];
 
-    // Relasi ke jadwal (One to One)
-    public function jadwal()
-    {
-        return $this->belongsTo(Jadwal::class, 'jadwal_id');
-    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

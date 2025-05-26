@@ -6,130 +6,104 @@
 
 @section('content')
     <div class="w-[27rem] md:w-full xl:w-full">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
-            <div>
-                <!-- Dropdown Pilih Bulan -->
-                <label for="monthSelector" class="block text-sm font-medium text-gray-700 mb-2">Pilih Bulan:</label>
-                <select id="monthSelector" class="form-select block w-80 md:w-full p-2 border border-gray-300 rounded-md">
-                    @foreach ($jadwals->groupBy(function ($item) {
-            return date('Y-m', strtotime($item->tanggal)); // Format YYYY-MM
-        }) as $bulan => $jadwal)
-                        @php
-                            $bulanIndonesia = [
-                                'January' => 'Januari',
-                                'February' => 'Februari',
-                                'March' => 'Maret',
-                                'April' => 'April',
-                                'May' => 'Mei',
-                                'June' => 'Juni',
-                                'July' => 'Juli',
-                                'August' => 'Agustus',
-                                'September' => 'September',
-                                'October' => 'Oktober',
-                                'November' => 'November',
-                                'December' => 'Desember',
-                            ];
-                            $bulanFormatted = date('F Y', strtotime($bulan . '-01'));
-                            $bulanTranslated = str_replace(
-                                array_keys($bulanIndonesia),
-                                array_values($bulanIndonesia),
-                                $bulanFormatted,
-                            );
-                        @endphp
-                        <option value="{{ $bulan }}">{{ $bulanTranslated }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <div id="scheduleContainer">
+            @php
+                $selectedDate = request()->query('tanggal', date('Y-m-d'));
+                $jadwalUntukTanggal = $jadwals[$selectedDate] ?? collect();
+            @endphp
 
-            <div>
-                <!-- Dropdown Pilih Tanggal -->
-                <label for="dateSelector" class="block text-sm font-medium text-gray-700 mb-2">Pilih Tanggal:</label>
-                <select id="dateSelector" class="form-select block w-80 md:w-full xl:w-full p-2 border border-gray-300 rounded-md">
-                    @foreach ($jadwals->groupBy('tanggal') as $tanggal => $jadwal)
-                        <option value="table-{{ $tanggal }}" data-month="{{ date('Y-m', strtotime($tanggal)) }}">
-                            {{ date('d', strtotime($tanggal)) }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            <input type="date" id="datePicker" class="form-input ..." value="{{ $selectedDate }}">
 
-            <div class="flex items-end space-x-2">
-                <button id="showScheduleButton"
-                    class="btn btn-primary mt-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                    Tampilkan Jadwal
-                </button>
-                @if (Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.pemesanan.create') }}" class="btn btn-success mt-4 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600">
-                        Tambah Pesanan
-                    </a>
-                @else
-                    <a href="{{ route('pemesanan.create') }}"
-                        class="btn btn-success mt-4 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600">
-                        Tambah Pesanan
-                    </a>
-                @endif
-            </div>
-        </div>
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('admin.pemesanan.create') }}"
+                    class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Tambah Pemesanan
+                </a>
+            @else
+                <a href="{{ route('pemesanan.create') }}"
+                    class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Tambah Pemesanan
+                </a>
+            @endif
 
-        @foreach ($jadwals->groupBy('tanggal') as $tanggal => $jadwal)
-            <div id="table-{{ $tanggal }}" class="schedule-table hidden">
-                <div class="bg-white shadow-sm rounded-lg mb-6">
-                    <div class="p-4">
-                        <h5 class="text-center text-xl font-semibold text-black mb-4">
-                            {{ date('l, d F Y', strtotime($tanggal)) }}</h5>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full table-auto text-center text-sm text-gray-700 border-collapse">
-                                <thead class="bg-emerald-600 text-white">
+
+            <div class="bg-white shadow-sm rounded-lg mb-6">
+                <div class="p-4">
+                    <h5 class="text-center text-xl font-semibold text-black mb-4">
+                        {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}
+                    </h5>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-auto text-center text-sm text-gray-700 border-collapse">
+                            <thead class="bg-emerald-600 text-white">
+                                <tr>
+                                    <th class="px-4 py-2 border border-gray-300"><i class="fas fa-clock mr-2"></i>Jam</th>
+                                    @for ($lapangan = 1; $lapangan <= 5; $lapangan++)
+                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
+                                            <i class="fas fa-futbol mr-2"></i>Lapangan {{ $lapangan }}
+                                        </th>
+                                    @endfor
+                                </tr>
+                                <tr class="bg-teal-500 text-white">
+                                    <th class="px-4 py-2 border border-gray-300">Waktu</th>
+                                    @for ($lapangan = 1; $lapangan <= 5; $lapangan++)
+                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
+                                        <th class="px-4 py-2 border border-gray-300">DP</th>
+                                    @endfor
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $jamList = [
+                                        '07:00',
+                                        '08:00',
+                                        '09:00',
+                                        '10:00',
+                                        '11:00',
+                                        '12:00',
+                                        '13:00',
+                                        '14:00',
+                                        '15:00',
+                                        '16:00',
+                                        '17:00',
+                                        '18:00',
+                                        '19:00',
+                                        '20:00',
+                                        '21:00',
+                                        '22:00',
+                                        '23:00',
+                                    ];
+                                @endphp
+
+                                @if ($jadwalUntukTanggal->isEmpty())
                                     <tr>
-                                        <th class="px-4 py-2 border border-gray-300">
-                                            <i class="fas fa-clock mr-2"></i>Jam
-                                        </th>
-                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
-                                            <i class="fas fa-futbol mr-2"></i>Lapangan 1
-                                        </th>
-                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
-                                            <i class="fas fa-futbol mr-2"></i>Lapangan 2
-                                        </th>
-                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
-                                            <i class="fas fa-futbol mr-2"></i> Lapangan 3
-                                        </th>
-                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
-                                            <i class="fas fa-futbol mr-2"></i> Lapangan 4
-                                        </th>
-                                        <th class="px-4 py-2 border border-gray-300" colspan="2">
-                                            <i class="fas fa-futbol mr-2"></i> Lapangan 5
-                                        </th>
+                                        <td colspan="11" class="px-4 py-2 border border-gray-300 italic text-gray-500">
+                                            Data tidak ditemukan</td>
                                     </tr>
-                                    <tr class="bg-teal-500 text-white">
-                                        <th class="px-4 py-2 border border-gray-300">Waktu</th>
-                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
-                                        <th class="px-4 py-2 border border-gray-300">DP</th>
-                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
-                                        <th class="px-4 py-2 border border-gray-300">DP</th>
-                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
-                                        <th class="px-4 py-2 border border-gray-300">DP</th>
-                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
-                                        <th class="px-4 py-2 border border-gray-300">DP</th>
-                                        <th class="px-4 py-2 border border-gray-300">Nama Tim</th>
-                                        <th class="px-4 py-2 border border-gray-300">DP</th>
-                                </thead>
-                                <tbody>
-                                    @foreach (['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'] as $jam)
+                                @else
+                                    @foreach ($jamList as $jam)
                                         <tr class="border-t border-b border-gray-300">
                                             <td class="px-4 py-2 border border-gray-300">{{ $jam }}</td>
+
                                             @for ($lapangan = 1; $lapangan <= 5; $lapangan++)
                                                 @php
-                                                    $booking = $jadwal
-                                                        ->where('jam', $jam . ':00')
-                                                        ->where('lapangan', $lapangan)
-                                                        ->first();
+                                                    $booking = $jadwalUntukTanggal->first(function ($item) use (
+                                                        $jam,
+                                                        $lapangan,
+                                                    ) {
+                                                        return $item->jam == $jam && $item->lapangan == $lapangan;
+                                                    });
+
                                                 @endphp
+
                                                 @if ($booking)
+                                                    <td class="px-4 py-2 border border-gray-300">{{ $booking->nama_tim }}
+                                                    </td>
                                                     <td class="px-4 py-2 border border-gray-300">
-                                                        {{ $booking->pemesanan?->nama_tim }}</td>
-                                                    <td class="px-4 py-2 border border-gray-300">
-                                                        {{ $booking->pemesanan?->dp }}</td>
+                                                        @if (!is_null($booking->dp))
+                                                            {{ number_format($booking->dp, 0, ',', '.') }}
+                                                        @endif
+                                                    </td>
                                                 @else
                                                     <td class="px-4 py-2 border border-gray-300"></td>
                                                     <td class="px-4 py-2 border border-gray-300"></td>
@@ -137,12 +111,26 @@
                                             @endfor
                                         </tr>
                                     @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        @endforeach
+        </div>
     </div>
+
+    <script>
+        const datePicker = document.getElementById('datePicker');
+        const scheduleContainer = document.getElementById('scheduleContainer');
+
+        datePicker.addEventListener('change', () => {
+            const selectedDate = datePicker.value;
+            if (!selectedDate) return;
+
+            // Kirim request GET dengan query tanggal ke route ini untuk reload data
+            // Atau kamu bisa pakai ajax untuk reload bagian tabel saja, tapi ini cara paling sederhana:
+            window.location.href = `?tanggal=${selectedDate}`;
+        });
+    </script>
 @endsection

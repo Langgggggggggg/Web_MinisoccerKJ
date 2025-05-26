@@ -67,7 +67,7 @@
                                 <td class="py-2 px-4 border">{{ $item->tanggal }}</td>
                                 <td class="py-2 px-4 border">{{ $item->jam_mulai }}</td>
                                 <td class="py-2 px-4 border">{{ $item->jam_selesai }}</td>
-                                <td class="py-2 px-4 border">{{ $item->jadwal->lapangan }}</td>
+                                <td class="py-2 px-4 border">{{ $item->lapangan }}</td>
                                 <td class="py-2 px-4 border">Rp{{ number_format($item->dp) }}</td>
                                 <td class="py-2 px-4 border">Rp{{ number_format($item->harga) }}</td>
                                 <td class="py-2 px-4 border">Rp{{ number_format($item->sisa_bayar) }}</td>

@@ -58,7 +58,7 @@
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">
                                         {{ $pesan->jam_selesai }}</td>
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">
-                                        {{ $pesan->jadwal->lapangan }}</td>
+                                        {{ $pesan->lapangan }}</td>
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">
                                         Rp{{ number_format($pesan->dp, 0, ',', '.') }}</td>
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">

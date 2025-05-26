@@ -21,16 +21,16 @@
                             <label for="tanggal" class="block text-sm font-medium text-gray-700">
                                 <i class="fas fa-calendar-alt mr-2"></i> Tanggal:
                             </label>
-                            <input type="date" name="tanggal"
+                            <input type="date" name="tanggal" id="tanggal"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                required>
+                                required autocomplete="off">
                         </div>
 
                         <div>
                             <label for="lapangan" class="block text-sm font-medium text-gray-700">
                                 <i class="fas fa-futbol mr-2"></i> Lapangan:
                             </label>
-                            <select name="lapangan"
+                            <select name="lapangan" id="lapangan"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 required>
                                 <option value="" disabled selected>Pilih Lapangan</option>
@@ -48,48 +48,47 @@
                             <label for="jam_mulai" class="block text-sm font-medium text-gray-700">
                                 <i class="fas fa-clock mr-2"></i> Jam Mulai:
                             </label>
-                            <input type="time" name="jam_mulai"
+                            <input type="time" name="jam_mulai" id="jam_mulai"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                required>
+                                required autocomplete="off">
                         </div>
 
                         <div>
                             <label for="jam_selesai" class="block text-sm font-medium text-gray-700">
                                 <i class="fas fa-clock mr-2"></i> Jam Selesai:
                             </label>
-                            <input type="time" name="jam_selesai"
+                            <input type="time" name="jam_selesai" id="jam_selesai"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                required>
+                                required autocomplete="off">
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <label for="nama_tim" class="block text-sm font-medium text-gray-700">
-                            <i class="fas fa-user mr-2"></i> Nama Tim:
+                            <i class="fas fa-users mr-2"></i> Nama Tim:
                         </label>
-                        <input type="text" name="nama_tim"
+                        <input type="text" name="nama_tim" id="nama_tim"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            required>
+                            required autocomplete="off" placeholder="Contoh: Garuda FC">
                     </div>
 
                     <div class="mb-6">
                         <label for="no_telepon" class="block text-sm font-medium text-gray-700">
                             <i class="fas fa-phone mr-2"></i> No Telepon:
                         </label>
-                        <input type="text" name="no_telepon"
+                        <input type="tel" name="no_telepon" id="no_telepon"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            required>
+                            required autocomplete="off" placeholder="08xxxxxxxxxx">
                     </div>
 
                     <div class="mb-6">
                         <label for="dp" class="block text-sm font-medium text-gray-700">
-                            <i class="fas fa-dollar-sign mr-2"></i> DP (Rp):
+                            <i class="fas fa-money-bill-wave mr-2"></i> DP (Rp):
                         </label>
-                        <input type="number" name="dp" min="100000" id="dpInput"
+                        <input type="number" name="dp" id="dpInput" min="100000"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Minimal DP Rp 100.000" required>
+                            required placeholder="Minimal DP Rp 100.000">
                         <span id="dpWarning" class="text-red-500 text-sm mt-2 hidden">Minimal DP Rp 100.000!</span>
-
                     </div>
 
                     <div class="mb-6 flex justify-end space-x-2">
