@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="w-[27rem] md:w-full xl:w-full">
+    <div class="w-[19rem] md:w-full xl:w-full">
 
         <div id="scheduleContainer">
             @php
@@ -13,15 +13,15 @@
                 $jadwalUntukTanggal = $jadwals[$selectedDate] ?? collect();
             @endphp
 
-            <div class="flex gap-4 items-center mb-6">
+            <div class="flex flex-col sm:flex-row gap-4 items-center mb-6">
                 <!-- Date Picker -->
-                <div>
+                <div class="w-full sm:w-auto">
                     <input type="date" id="datePicker"
-                        class="form-input px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        class="form-input w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         value="{{ $selectedDate }}">
                 </div>
 
-                <div>
+                <div class="w-full sm:w-auto sm:mt-0">
                     @php
                         $route =
                             Auth::user()->role === 'admin'
@@ -30,7 +30,7 @@
                     @endphp
 
                     <a href="{{ $route }}"
-                        class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center transition-colors duration-200">
+                        class="w-full sm:w-auto text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center transition-colors duration-200">
                         <i class="fas fa-plus mr-2"></i>
                         Tambah Pemesanan
                     </a>

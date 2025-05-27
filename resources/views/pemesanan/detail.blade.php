@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="w-[27rem] md:w-full xl:w-full">
+    <div class="w-[18rem] md:w-full xl:w-full">
         <div class="lg:w-[75rem] max-w-full overflow-x-auto bg-white rounded-lg shadow-md">
             <div class="flex flex-col md:flex-row justify-between items-center border-b border-gray-200 p-2 gap-2">
                 <div class="flex space-x-2">
