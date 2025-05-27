@@ -13,23 +13,36 @@
                 $jadwalUntukTanggal = $jadwals[$selectedDate] ?? collect();
             @endphp
 
-            <input type="date" id="datePicker" class="form-input ..." value="{{ $selectedDate }}">
+            <div class="flex gap-4 items-center mb-6">
+                <!-- Date Picker -->
+                <div>
+                    <input type="date" id="datePicker"
+                        class="form-input px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        value="{{ $selectedDate }}">
+                </div>
 
-            @if (Auth::user()->role === 'admin')
-                <a href="{{ route('admin.pemesanan.create') }}"
-                    class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
-                    <i class="fas fa-plus mr-2"></i> Tambah Pemesanan
-                </a>
-            @else
-                <a href="{{ route('pemesanan.create') }}"
-                    class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
-                    <i class="fas fa-plus mr-2"></i> Tambah Pemesanan
-                </a>
-            @endif
+                <div>
+                    @php
+                        $route =
+                            Auth::user()->role === 'admin'
+                                ? route('admin.pemesanan.create')
+                                : route('pemesanan.create');
+                    @endphp
+
+                    <a href="{{ $route }}"
+                        class="text-white bg-green-700 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>
+                        Tambah Pemesanan
+                    </a>
+                </div>
+            </div>
 
 
             <div class="bg-white shadow-sm rounded-lg mb-6">
                 <div class="p-4">
+                    @php
+                        \Carbon\Carbon::setLocale('id');
+                    @endphp
                     <h5 class="text-center text-xl font-semibold text-black mb-4">
                         {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}
                     </h5>

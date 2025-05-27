@@ -11,7 +11,6 @@ class CreatePemesananTable extends Migration
     Schema::create('pemesanan', function (Blueprint $table) {
         $table->id();
         $table->unsignedBigInteger('user_id'); // Foreign key ke users
-        $table->unsignedBigInteger('jadwal_id')->nullable(); // Foreign key ke jadwal
         $table->string('kode_pemesanan');
         $table->date('tanggal'); 
         $table->time('jam_mulai'); 
@@ -29,8 +28,7 @@ class CreatePemesananTable extends Migration
 
         // Foreign key constraints
         $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        $table->foreign('jadwal_id')->references('id')->on('jadwal')->onDelete('cascade');
-        $table->unique(['kode_pemesanan', 'jadwal_id']);
+        $table->unique(['kode_pemesanan']);
     });
 }
 

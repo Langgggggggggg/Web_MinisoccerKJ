@@ -221,4 +221,15 @@
                 });
         }
     </script>
+    <script>
+        const input = document.getElementById('dpInput');
+
+        input.addEventListener('input', function() {
+            const nilai = parseInt(this.value, 10);
+
+            if (!isNaN(nilai) && nilai < 100000) {
+                this.value = 100000;
+            }
+        });
+    </script>
 @endsection
