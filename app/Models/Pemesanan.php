@@ -14,7 +14,6 @@ class Pemesanan extends Model
     protected $fillable = [
         'user_id',
         'kode_pemesanan',
-        'jadwal_id',
         'tanggal',
         'jam_mulai',
         'jam_selesai',
