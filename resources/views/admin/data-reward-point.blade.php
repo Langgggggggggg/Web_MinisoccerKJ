@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div class="w-[27rem] md:w-full xl:w-full">
+<div class="w-[19rem] md:w-full xl:w-full">
     <div class="max-w-full overflow-x-auto bg-white rounded-lg shadow-md">
         <table class="table-auto w-full text-center text-sm text-gray-700">
             <thead class="bg-emerald-600">

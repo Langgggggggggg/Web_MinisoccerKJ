@@ -4,8 +4,8 @@
     @include('layouts.header')
 @endsection
 @section('content')
-    <div class="w-[27rem] md:w-full xl:w-full">
-        <div class="flex justify-end items-center mb-4">
+    <div class="w-[19rem] md:w-full xl:w-full">
+        <div class="flex md:justify-end  items-center mb-4">
             <a href="{{ route('admin.information.create') }}"
                 class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
                 <i class="fas fa-plus mr-2"></i>Tambah Informasi

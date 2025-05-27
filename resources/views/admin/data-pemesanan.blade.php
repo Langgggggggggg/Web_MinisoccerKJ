@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-        <div class="w-[27rem] md:w-full xl:w-full">
+        <div class="w-[19rem] md:w-full xl:w-full">
             <div class="lg:w-[75rem] max-w-full overflow-x-auto bg-white rounded-lg shadow-md">
                 <div class="md:flex md:gap-4 md:justify-between grid grid-cols-1">
                     <!-- Form Pencarian -->

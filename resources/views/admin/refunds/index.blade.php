@@ -3,7 +3,7 @@
     @include('layouts.header')
 @endsection
 @section('content')
-<div class="max-w-6xl mx-auto  px-4 sm:px-6 lg:px-8">
+<div class="w-[19rem] md:w-full xl:w-full">
     {{-- <!-- Header Section -->
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Daftar Pengajuan Refund</h2>
