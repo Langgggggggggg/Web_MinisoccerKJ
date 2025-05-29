@@ -130,10 +130,46 @@
                 return;
             }
 
-            // Hitung total biaya sewa berdasarkan lapangan dan jam
-            const jamMulai = parseInt(formData.jam_mulai.split(":")[0]);
-            const jamSelesai = parseInt(formData.jam_selesai.split(":")[0]);
+            const [jamMulaiHour, jamMulaiMinute] = formData.jam_mulai.split(":").map(Number);
+            const [jamSelesaiHour, jamSelesaiMinute] = formData.jam_selesai.split(":").map(Number);
+
+            // Cek menit jam mulai
+            if (jamMulaiMinute !== 0) {
+                const contohJamMulai = `${jamMulaiHour.toString().padStart(2, '0')}:00`;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Jam Mulai Tidak Valid',
+                    text: `Jam mulai yang Anda masukkan adalah ${formData.jam_mulai}. Jam mulai harus tepat di menit 00, misalnya ${contohJamMulai}.`,
+                });
+                return;
+            }
+
+            // Cek menit jam selesai
+            if (jamSelesaiMinute !== 0) {
+                const contohJamSelesai = `${jamSelesaiHour.toString().padStart(2, '0')}:00`;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Jam Selesai Tidak Valid',
+                    text: `Jam selesai yang Anda masukkan adalah ${formData.jam_selesai}. Jam selesai harus tepat di menit 00, misalnya ${contohJamSelesai}.`,
+                });
+                return;
+            }
+
+            // Cek urutan jam
+            if (jamSelesaiHour <= jamMulaiHour) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Durasi Tidak Valid',
+                    text: `Jam mulai: ${formData.jam_mulai} dan jam selesai: ${formData.jam_selesai}. Jam selesai harus lebih besar dari jam mulai.`,
+                });
+                return;
+            }
+
+            // Hitung durasi seperti biasa
+            const jamMulai = jamMulaiHour;
+            const jamSelesai = jamSelesaiHour;
             const durasi = jamSelesai - jamMulai;
+
 
             let hargaPerJam = 0;
             const lap = parseInt(formData.lapangan);
