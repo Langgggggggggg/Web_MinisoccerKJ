@@ -35,7 +35,7 @@
         </div>
     </section>
 
-    <!-- Stats Counter Section -->
+    {{-- <!-- Stats Counter Section -->
     <section class="bg-green-50">
         <div class="container mx-auto py-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -57,7 +57,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- Feature Section with Better Visual Hierarchy -->
     <section class="py-16">
