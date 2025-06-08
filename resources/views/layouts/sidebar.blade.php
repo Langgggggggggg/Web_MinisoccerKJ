@@ -31,7 +31,7 @@
             @if (Auth::user()->role === 'user')
                 <a href="{{ route('dashboard') }}"
                     class="sidebar-link block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-emerald-600' : '' }}">
-                    <i class="fas fa-user-alt w-5 h-5 mr-2"></i> Dashboard Penyewa
+                    <i class="fas fa-user-alt w-5 h-5 mr-2"></i> Dashboard
                 </a>
                 <a href="{{ route('jadwal.index') }}"
                     class="lazy-loading block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
@@ -49,16 +49,16 @@
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('user.refund.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-money-bill-wave w-5 h-5 mr-2"></i> Data Refund
                 </a>
-                <a href="{{ route('map.index') }}"
+                {{-- <a href="{{ route('map.index') }}"
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('map.index') ? 'bg-emerald-600' : '' }}">
                     <i class="fas fa-search w-5 h-5 mr-2"></i> Cari lawan tanding
-                </a>
+                </a> --}}
             @endif
 
             @if (Auth::user()->role === 'admin')
                 <a href="{{ route('admin.dashboard') }}"
                     class="block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600' : '' }}">
-                    <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Dashboard Pengelola
+                    <i class="fas fa-user-shield w-5 h-5 mr-2"></i> Dashboard
                 </a>
                 <a href="{{ route('jadwal.index') }}"
                     class="lazy-loading block rounded px-4 py-2.5 transition duration-200 hover:bg-emerald-600 hover:text-white {{ request()->routeIs('jadwal.index') ? 'bg-emerald-600' : '' }}">
