@@ -11,6 +11,12 @@
                 <h2 class="text-2xl font-semibold">
                     <i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Lapangan
                 </h2>
+                <div class="flex justify-end mt-2">
+                    <button type="button" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 text-sm"
+                        onclick="toggleModal('hargaModal')">
+                        💰 Lihat Daftar Harga
+                    </button>
+                </div>
             </div>
             <div class="p-6">
                 <form action="/pemesanan/store" method="POST" id="bookingForm">
@@ -106,6 +112,31 @@
             </div>
         </div>
     </div>
+    <div id="hargaModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative flex flex-col">
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="toggleModal('hargaModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-xl font-bold mb-4 text-emerald-600">Daftar Harga Lapangan</h2>
+
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-700">Jam 07.00 - 17.00</h3>
+                <ul class="list-disc list-inside text-sm text-gray-600">
+                    <li>Lapangan 1, 2, 3: Rp 300.000</li>
+                    <li>Lapangan 4, 5: Rp 350.000</li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-semibold text-gray-700">Jam 17.00 - 23.00</h3>
+                <ul class="list-disc list-inside text-sm text-gray-600">
+                    <li>Lapangan 1, 2, 3: Rp 400.000</li>
+                    <li>Lapangan 4, 5: Rp 450.000</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
     </script>
     <script>
@@ -255,6 +286,17 @@
                 .catch(error => {
                     console.error("Error:", error);
                 });
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
         }
     </script>
 @endsection

@@ -314,7 +314,7 @@ class PemesananController extends Controller
         if ($hari === 'Monday') {
             return response()->json([
                 'success' => false,
-                'message' => 'Pemesanan tidak tersedia pada hari Senin karena hari libur.',
+                'message' => 'Jadwal yang dipilih tidak tersedia karena pada hari Senin Minisoccer KJ libur.',
             ]);
         }
 

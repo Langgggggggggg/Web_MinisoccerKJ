@@ -309,7 +309,7 @@ class AdminController extends Controller
         // ✅ Cek jika hari adalah Senin
         $hari = \Carbon\Carbon::parse($request->tanggal)->format('l');
         if ($hari === 'Monday') {
-            return back()->with('error', 'Pemesanan tidak tersedia pada hari Senin karena hari libur.');
+            return back()->with('error', 'Jadwal yang dipilih tidak tersedia karena pada hari Senin Minisoccer KJ libur.');
         }
 
         // ✅ Cek tumpang tindih jadwal
@@ -382,7 +382,7 @@ class AdminController extends Controller
         // Cek jika hari adalah Senin
         $hari = \Carbon\Carbon::parse($request->tanggal)->format('l');
         if ($hari === 'Monday') {
-            return back()->with('error', 'Pemesanan tidak tersedia pada hari Senin karena hari libur.');
+            return back()->with('error', 'Jadwal yang dipilih tidak tersedia karena pada hari Senin Minisoccer KJ libur.');
         }
 
         // Cek jadwal bentrok
