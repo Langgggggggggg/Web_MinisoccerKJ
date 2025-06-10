@@ -46,22 +46,30 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label for="jam_mulai" class="block text-sm font-medium text-gray-700">
-                            <i class="fas fa-clock mr-2"></i> Jam Mulai:
-                        </label>
-                        <input type="time" name="jam_mulai" value="{{ old('jam_mulai') }}"
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            required>
-                        @error('jam_mulai') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <i class="fas fa-clock mr-2"></i> Jam Mulai:
+                            </label>
+                            <select name="jam_mulai" id="jam_mulai"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                required>
+                                <option value="" disabled selected>Pilih Jam Mulai</option>
+                                @for ($i = 7; $i <= 22; $i++)
+                                    <option value="{{ sprintf('%02d:00', $i) }}">{{ sprintf('%02d:00', $i) }}</option>
+                                @endfor
+                            </select>
                     </div>
 
                     <div>
-                        <label for="jam_selesai" class="block text-sm font-medium text-gray-700">
-                            <i class="fas fa-clock mr-2"></i> Jam Selesai:
-                        </label>
-                        <input type="time" name="jam_selesai" value="{{ old('jam_selesai') }}"
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            required>
-                        @error('jam_selesai') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                       <label for="jam_selesai" class="block text-sm font-medium text-gray-700">
+                                <i class="fas fa-clock mr-2"></i> Jam Selesai:
+                            </label>
+                            <select name="jam_selesai" id="jam_selesai"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                required>
+                                <option value="" disabled selected>Pilih Jam Selesai</option>
+                                @for ($i = 8; $i <= 23; $i++)
+                                    <option value="{{ sprintf('%02d:00', $i) }}">{{ sprintf('%02d:00', $i) }}</option>
+                                @endfor
+                            </select>
                     </div>
                 </div>
 
@@ -140,6 +148,72 @@
     }
 
     document.addEventListener('DOMContentLoaded', toggleDpField);
+</script>
+<script>
+    function updateAvailableHours() {
+        const tanggal = document.querySelector('input[name="tanggal"]').value;
+        const lapangan = document.querySelector('select[name="lapangan"]').value;
+        
+        if (!tanggal || !lapangan) return;
+
+        fetch('/admin/pemesanan/getBookedSchedules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ tanggal, lapangan })
+        })
+        .then(response => response.json())
+        .then(bookedSchedules => {
+            const jamMulaiSelect = document.querySelector('select[name="jam_mulai"]');
+            const jamSelesaiSelect = document.querySelector('select[name="jam_selesai"]');
+
+            // Reset semua options
+            Array.from(jamMulaiSelect.options).forEach(option => {
+                if (option.value) {
+                    option.disabled = false;
+                    option.title = ''; // Reset tooltip
+                }
+            });
+            Array.from(jamSelesaiSelect.options).forEach(option => {
+                if (option.value) {
+                    option.disabled = false;
+                    option.title = ''; // Reset tooltip
+                }
+            });
+
+            // Disable jam yang sudah dipesan
+            bookedSchedules.forEach(schedule => {
+                const startHour = parseInt(schedule.start.split(':')[0]);
+                const endHour = parseInt(schedule.end.split(':')[0]);
+
+                // Disable jam mulai yang konflik
+                Array.from(jamMulaiSelect.options).forEach(option => {
+                    if (!option.value) return;
+                    const hour = parseInt(option.value.split(':')[0]);
+                    if (hour >= startHour && hour < endHour) {
+                        option.disabled = true;
+                        option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                    }
+                });
+
+                // Disable jam selesai yang konflik
+                Array.from(jamSelesaiSelect.options).forEach(option => {
+                    if (!option.value) return;
+                    const hour = parseInt(option.value.split(':')[0]);
+                    if (hour > startHour && hour <= endHour) {
+                        option.disabled = true;
+                        option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                    }
+                });
+            });
+        });
+    }
+
+    // Tambahkan event listeners
+    document.querySelector('input[name="tanggal"]').addEventListener('change', updateAvailableHours);
+    document.querySelector('select[name="lapangan"]').addEventListener('change', updateAvailableHours);
 </script>
 <!-- Sweet Alert CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

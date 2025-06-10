@@ -478,10 +478,26 @@ class AdminController extends Controller
                 ->with('error', 'Terjadi kesalahan saat hapus: ' . $e->getMessage());
         }
     }
-
     public function dataMember()
     {
         $members = Member::where('status', 'aktif')->get();
         return view('admin.data-member', compact('members'));
+    }
+    public function getBookedSchedules(Request $request)
+    {
+        $tanggal = $request->tanggal;
+        $lapangan = $request->lapangan;
+
+        $bookedSchedules = Pemesanan::where('tanggal', $tanggal)
+            ->where('lapangan', $lapangan)
+            ->get(['kode_pemesanan', 'tanggal', 'jam_mulai', 'jam_selesai'])
+            ->map(function ($item) {
+                return [
+                    'start' => $item->jam_mulai,
+                    'end' => $item->jam_selesai
+                ];
+            });
+
+        return response()->json($bookedSchedules);
     }
 }

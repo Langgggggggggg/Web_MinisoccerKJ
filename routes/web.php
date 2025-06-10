@@ -68,7 +68,7 @@ Route::middleware(['auth', \App\Http\Middleware\UserMiddleware::class])->group(f
     Route::get('/dashboard', [PenawaranMemberController::class, 'index'])->name('dashboard');
     Route::get('/member/create', [PenawaranMemberController::class, 'create'])
         ->name('member.create')
-        ;
+    ;
     Route::post('/pemesanan/member', [PemesananController::class, 'storeMember'])->name('pemesanan.storeMember');
 
     Route::get('/refund', [RefundController::class, 'index'])->name('refunds.index');
@@ -98,6 +98,8 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     })->name('admin.konfirmasi-pelunasan');
     Route::post('/admin/konfirmasi-pelunasan', [AdminController::class, 'konfirmasiPelunasan'])->name('admin.konfirmasi-pelunasan');
 
+    // Di dalam grup middleware admin
+    Route::post('/admin/pemesanan/getBookedSchedules', [AdminController::class, 'getBookedSchedules'])->name('admin.pemesanan.getBookedSchedules');
     // Data Pemesanan dan Reward
     Route::get('/admin/pemesanan', [AdminController::class, 'dataPemesanan'])->name('admin.data-pemesanan');
     Route::get('/admin/reward-points', [AdminController::class, 'dataRewardPoint'])->name('admin.reward-points');

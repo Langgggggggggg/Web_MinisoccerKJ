@@ -364,7 +364,7 @@ class PemesananController extends Controller
 
         $bookedSchedules = Pemesanan::where('tanggal', $tanggal)
             ->where('lapangan', $lapangan)
-            ->get(['jam_mulai', 'jam_selesai'])
+            ->get(['kode_pemesanan', 'tanggal', 'jam_mulai', 'jam_selesai'])
             ->map(function ($item) {
                 return [
                     'start' => $item->jam_mulai,
