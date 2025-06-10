@@ -59,6 +59,7 @@ Route::middleware(['auth', \App\Http\Middleware\UserMiddleware::class])->group(f
     Route::put('/pemesanan/{kode_pemesanan}', [PemesananController::class, 'update'])->name('pemesanan.update');
     Route::post('/pemesanan/validateSchedule', [PemesananController::class, 'validateSchedule']);
     Route::post('/pemesanan/getSnapToken', [PemesananController::class, 'getSnapToken'])->name('pemesanan.getSnapToken');
+    Route::post('/pemesanan/getBookedSchedules', [PemesananController::class, 'getBookedSchedules'])->name('pemesanan.getBookedSchedules');
 
     // Reward Points
     Route::get('/reward-points', [RewardPointController::class, 'index'])->name('reward.index');

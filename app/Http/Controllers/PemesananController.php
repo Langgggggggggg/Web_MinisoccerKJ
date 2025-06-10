@@ -292,9 +292,6 @@ class PemesananController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat update: ' . $e->getMessage());
         }
     }
-
-
-
     public function validateSchedule(Request $request)
     {
         $request->validate([
@@ -338,52 +335,6 @@ class PemesananController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
-
-    // private function KirimNotifikasiWhatsApp(Pemesanan $pemesanan, $isUpdated = false)
-    // {
-    //     $phoneNumber = $pemesanan->no_telepon;
-
-    //     if (substr($phoneNumber, 0, 1) === '0') {
-    //         $phoneNumber = '62' . substr($phoneNumber, 1);
-    //     }
-
-    //     if (!$pemesanan->tanggal || !$pemesanan->jam_selesai) {
-    //         Log::error('Gagal mengirim notifikasi: Data tanggal atau jam_selesai tidak valid.');
-    //         return;
-    //     }
-
-    //     try {
-    //         $scheduleDateTime = Carbon::parse($pemesanan->tanggal . ' ' . $pemesanan->jam_selesai, 'Asia/Jakarta')->timestamp;
-    //     } catch (\Exception $e) {
-    //         Log::error('Format tanggal atau waktu salah: ' . $e->getMessage());
-    //         return;
-    //     }
-
-    //     // ⬇️ Bedakan pesan tergantung apakah ini dari update atau store
-    //     if ($isUpdated) {
-    //         $message = "Hallo, {$pemesanan->nama_tim}. Jadwal bermain Anda telah diubah. Ini adalah pengingat terbaru. Waktu bermain selesai pada {$pemesanan->jam_selesai}, mohon selesaikan pembayaran tepat waktu.";
-    //     } else {
-    //         $message = "Hallo, {$pemesanan->nama_tim}. Terimakasih telah bermain di tempat kami. Waktu bermain Anda telah selesai, mohon untuk menyelesaikan pembayaran!";
-    //     }
-
-    //     $response = Http::withHeaders([
-    //         'Authorization' => config('services.fonnte.token'),
-    //     ])->asForm()->post('https://api.fonnte.com/send', [
-    //         'target' => $phoneNumber,
-    //         'message' => $message,
-    //         'schedule' => $scheduleDateTime,
-    //         'countryCode' => '',
-    //     ]);
-
-    //     Log::info("Fonnte API Response: " . $response->body());
-
-    //     if ($response->failed()) {
-    //         Log::error('Gagal mengirim notifikasi WhatsApp: ' . $response->body());
-    //     }
-    // }
-
     public function getSnapToken(Request $request)
     {
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
@@ -404,5 +355,23 @@ class PemesananController extends Controller
 
         $snapToken = \Midtrans\Snap::getSnapToken($params);
         return response()->json(['snapToken' => $snapToken]);
+    }
+
+    public function getBookedSchedules(Request $request)
+    {
+        $tanggal = $request->tanggal;
+        $lapangan = $request->lapangan;
+
+        $bookedSchedules = Pemesanan::where('tanggal', $tanggal)
+            ->where('lapangan', $lapangan)
+            ->get(['jam_mulai', 'jam_selesai'])
+            ->map(function ($item) {
+                return [
+                    'start' => $item->jam_mulai,
+                    'end' => $item->jam_selesai
+                ];
+            });
+
+        return response()->json($bookedSchedules);
     }
 }
