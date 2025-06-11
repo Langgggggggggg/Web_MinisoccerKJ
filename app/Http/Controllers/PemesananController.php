@@ -89,7 +89,10 @@ class PemesananController extends Controller
                 'status' => $status,
             ]);
 
-            NotifikasiHelper::kirimWhatsApp($pemesanan);
+            // Kirim notifikasi WhatsApp untuk detail pemesanan baru
+            NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
+            // Kirim notifikasi pengingat pembayaran
+            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
 
             DB::commit();
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil!');
@@ -187,7 +190,8 @@ class PemesananController extends Controller
                     'status' => $status,
                 ]);
 
-                NotifikasiHelper::kirimWhatsApp($pemesanan);
+                // Kirim notifikasi pengingat pembayaran
+                NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
                 $lastTanggal = $tanggal;
             }
 
@@ -283,7 +287,7 @@ class PemesananController extends Controller
                 'status' => $status,
             ]);
 
-            NotifikasiHelper::kirimWhatsApp($pemesanan, true); // kirim notifikasi update
+           NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true); // kirim notifikasi update
             DB::commit();
 
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil diperbarui!');

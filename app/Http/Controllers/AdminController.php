@@ -351,7 +351,7 @@ class AdminController extends Controller
             ]);
 
             if (!$is_gratis) {
-                NotifikasiHelper::kirimWhatsApp($pemesanan);
+                NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
             }
             DB::commit();
             return redirect()->route('admin.data-pemesanan')
@@ -434,7 +434,7 @@ class AdminController extends Controller
                 'status'       => $status,
             ]);
 
-            NotifikasiHelper::kirimWhatsApp($pemesanan, true);
+            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true);
 
             DB::commit();
             return redirect()->route('admin.data-pemesanan')
