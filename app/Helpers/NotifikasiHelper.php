@@ -10,8 +10,6 @@ class NotifikasiHelper
 {
     public static function kirimNotifikasiPembayaran(Pemesanan $pemesanan, $isUpdated = false)
     {
-        // Ini adalah fungsi yang sebelumnya bernama kirimWhatsApp
-        // Logic tetap sama seperti sebelumnya
         $phoneNumber = $pemesanan->no_telepon;
 
         if (substr($phoneNumber, 0, 1) === '0') {
@@ -31,9 +29,18 @@ class NotifikasiHelper
         }
 
         if ($isUpdated) {
-            $message = "Hallo, {$pemesanan->nama_tim}. Jadwal bermain Anda telah diubah. Ini adalah pengingat terbaru. Waktu bermain selesai pada {$pemesanan->jam_selesai}, mohon selesaikan pembayaran tepat waktu.";
+            $message = "Hallo *{$pemesanan->nama_tim}* ⚽,\n\n"
+                . "ℹ️ Kami informasikan bahwa jadwal bermain Anda sebelumnya telah diperbarui. "
+                . "⏰ Waktu bermain anda sekarang yang diperbarui sudah berakhir pada pukul *{$pemesanan->jam_selesai}*. "
+                . "💳 Mohon segera menyelesaikan pembayaran di kasir kami.\n\n"
+                . "🙏 Terima kasih telah bermain di Minisoccer KJ. "
+                . "👋 Kami menantikan kunjungan Anda kembali!";
         } else {
-            $message = "Hallo, {$pemesanan->nama_tim}. Terimakasih telah bermain di tempat kami. Waktu bermain Anda telah selesai, mohon untuk menyelesaikan pembayaran!";
+            $message = "Hallo *{$pemesanan->nama_tim}* ⚽,\n\n"
+                . "⏰ Waktu bermain Anda telah selesai pada pukul *{$pemesanan->jam_selesai}*. "
+                . "💳 Mohon segera menyelesaikan pembayaran di kasir kami.\n\n"
+                . "🙏 Terima kasih telah bermain di Minisoccer KJ. "
+                . "👋 Kami menantikan kunjungan Anda kembali!";
         }
 
         $response = Http::withHeaders([
