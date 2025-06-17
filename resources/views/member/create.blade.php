@@ -232,7 +232,8 @@
         }
 
         // Validasi DP minimal
-        if (formData.dp < 400000) {
+        if (formData.dp < 20000) {
+        // if (formData.dp < 400000) {
             Swal.fire({
                 icon: 'error',
                 title: 'DP yang Anda bayar kurang',

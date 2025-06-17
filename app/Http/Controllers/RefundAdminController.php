@@ -22,32 +22,32 @@ class RefundAdminController extends Controller
     }
 
     public function approve(Request $request, $id)
-{
-    $request->validate([
-        'bukti_transfer' => 'required|image|mimes:jpg,jpeg,png|max:2048'
-    ]);
+    {
+        $request->validate([
+            'bukti_transfer' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
 
-    $refund = Refund::with('pemesanan')->findOrFail($id);
-    $pemesanan = $refund->pemesanan;
+        $refund = Refund::with('pemesanan')->findOrFail($id);
+        $pemesanan = $refund->pemesanan;
 
-    if (!$pemesanan) {
-        return back()->with('error', 'Data pemesanan tidak ditemukan.');
+        if (!$pemesanan) {
+            return back()->with('error', 'Data pemesanan tidak ditemukan.');
+        }
+
+        // Upload bukti transfer
+        $path = $request->file('bukti_transfer')->store('refunds', 'public');
+
+        // Update refund status dan simpan bukti
+        $refund->update([
+            'status' => 'disetujui',
+            'bukti_transfer' => $path,
+        ]);
+
+        // Hapus pemesanan
+        $pemesanan->delete();
+
+        return redirect()->route('admin.refunds.index')->with('success', 'Refund disetujui dan data pemesanan telah dihapus.');
     }
-
-    // Upload bukti transfer
-    $path = $request->file('bukti_transfer')->store('refunds', 'public');
-
-    // Update refund status dan simpan bukti
-    $refund->update([
-        'status' => 'disetujui',
-        'bukti_transfer' => $path,
-    ]);
-
-    // Hapus pemesanan
-    $pemesanan->delete();
-
-    return redirect()->route('admin.refunds.index')->with('success', 'Refund disetujui dan data pemesanan telah dihapus.');
-}
 
 
 

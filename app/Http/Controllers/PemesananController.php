@@ -40,7 +40,8 @@ class PemesananController extends Controller
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'nama_tim' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
-            'dp' => 'required|numeric|min:100000',
+            'dp' => 'required|numeric|min:10000',
+            // 'dp' => 'required|numeric|min:100000',
         ]);
 
         $kode_pemesanan = strtoupper(substr(uniqid(), -5));
@@ -113,7 +114,8 @@ class PemesananController extends Controller
             'jam_selesai' => 'required|array',
             'nama_tim' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
-            'dp' => 'required|numeric|min:100000',
+            // 'dp' => 'required|numeric|min:100000',
+            'dp' => 'required|numeric|min:20000',
         ]);
 
         $user = Auth::user();
@@ -343,6 +345,7 @@ class PemesananController extends Controller
     {
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
         \Midtrans\Config::$isProduction = false;
+        // \Midtrans\Config::$isProduction = true;
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
