@@ -38,30 +38,35 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label for="tanggal_{{$i}}" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                                    <input type="date" name="tanggal[]" id="tanggal_{{$i}}"
+                                    <label for="tanggal_{{ $i }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                                    <input type="date" name="tanggal[]" id="tanggal_{{ $i }}"
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
-                                        onchange="updateAvailableHoursMember({{$i}})">
+                                        onchange="updateAvailableHoursMember({{ $i }})">
                                 </div>
 
                                 <div>
-                                    <label for="jam_mulai_{{$i}}" class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
-                                    <select name="jam_mulai[]" id="jam_mulai_{{$i}}"
+                                    <label for="jam_mulai_{{ $i }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
+                                    <select name="jam_mulai[]" id="jam_mulai_{{ $i }}"
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
                                         <option value="">Pilih Jam Mulai</option>
                                         @for ($hour = 7; $hour <= 22; $hour++)
-                                            <option value="{{ sprintf('%02d:00', $hour) }}">{{ sprintf('%02d:00', $hour) }}</option>
+                                            <option value="{{ sprintf('%02d:00', $hour) }}">{{ sprintf('%02d:00', $hour) }}
+                                            </option>
                                         @endfor
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label for="jam_selesai_{{$i}}" class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
-                                    <select name="jam_selesai[]" id="jam_selesai_{{$i}}"
+                                    <label for="jam_selesai_{{ $i }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
+                                    <select name="jam_selesai[]" id="jam_selesai_{{ $i }}"
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
                                         <option value="">Pilih Jam Selesai</option>
                                         @for ($hour = 8; $hour <= 23; $hour++)
-                                            <option value="{{ sprintf('%02d:00', $hour) }}">{{ sprintf('%02d:00', $hour) }}</option>
+                                            <option value="{{ sprintf('%02d:00', $hour) }}">
+                                                {{ sprintf('%02d:00', $hour) }}</option>
                                         @endfor
                                     </select>
                                 </div>
@@ -119,8 +124,11 @@
         </div>
     </div>
 @endsection
-
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<!-- script Snap.js ke production -->
+<script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<!-- script Snap.js ke sandbox -->
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -130,7 +138,8 @@
             lapanganSelect.addEventListener('change', () => {
                 // Update semua jadwal ketika lapangan berubah
                 for (let i = 0; i < 4; i++) {
-                    const tanggalInput = document.querySelector(`input[name="tanggal[]"][id="tanggal_${i}"]`);
+                    const tanggalInput = document.querySelector(
+                        `input[name="tanggal[]"][id="tanggal_${i}"]`);
                     if (tanggalInput && tanggalInput.value) {
                         updateAvailableHoursMember(i);
                     }
@@ -179,7 +188,7 @@
         };
 
         // Validasi form terisi
-        if (!formData.tanggal || !formData.jam_mulai || !formData.jam_selesai || 
+        if (!formData.tanggal || !formData.jam_mulai || !formData.jam_selesai ||
             !formData.nama_tim || !formData.no_telepon || !formData.dp) {
             Swal.fire('Error', 'Mohon lengkapi semua field yang diperlukan', 'error');
             return;
@@ -233,7 +242,7 @@
 
         // Validasi DP minimal
         if (formData.dp < 20000) {
-        // if (formData.dp < 400000) {
+            // if (formData.dp < 400000) {
             Swal.fire({
                 icon: 'error',
                 title: 'DP yang Anda bayar kurang',
@@ -310,61 +319,66 @@
     function updateAvailableHoursMember(index) {
         const tanggal = document.querySelector(`input[name="tanggal[]"][id="tanggal_${index}"]`).value;
         const lapangan = document.querySelector('select[name="lapangan"]').value;
-        
+
         if (!tanggal || !lapangan) return;
 
         fetch('/pemesanan/getBookedSchedules', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ tanggal, lapangan })
-        })
-        .then(response => response.json())
-        .then(bookedSchedules => {
-            const jamMulaiSelect = document.querySelector(`select[name="jam_mulai[]"][id="jam_mulai_${index}"]`);
-            const jamSelesaiSelect = document.querySelector(`select[name="jam_selesai[]"][id="jam_selesai_${index}"]`);
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    tanggal,
+                    lapangan
+                })
+            })
+            .then(response => response.json())
+            .then(bookedSchedules => {
+                const jamMulaiSelect = document.querySelector(
+                `select[name="jam_mulai[]"][id="jam_mulai_${index}"]`);
+                const jamSelesaiSelect = document.querySelector(
+                    `select[name="jam_selesai[]"][id="jam_selesai_${index}"]`);
 
-            // Reset semua options
-            Array.from(jamMulaiSelect.options).forEach(option => {
-                if (option.value) {
-                    option.disabled = false;
-                    option.title = '';
-                }
-            });
-            Array.from(jamSelesaiSelect.options).forEach(option => {
-                if (option.value) {
-                    option.disabled = false;
-                    option.title = '';
-                }
-            });
-
-            // Disable jam yang sudah dipesan
-            bookedSchedules.forEach(schedule => {
-                const startHour = parseInt(schedule.start.split(':')[0]);
-                const endHour = parseInt(schedule.end.split(':')[0]);
-
-                // Disable jam mulai yang konflik
+                // Reset semua options
                 Array.from(jamMulaiSelect.options).forEach(option => {
-                    if (!option.value) return;
-                    const hour = parseInt(option.value.split(':')[0]);
-                    if (hour >= startHour && hour < endHour) {
-                        option.disabled = true;
-                        option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                    if (option.value) {
+                        option.disabled = false;
+                        option.title = '';
+                    }
+                });
+                Array.from(jamSelesaiSelect.options).forEach(option => {
+                    if (option.value) {
+                        option.disabled = false;
+                        option.title = '';
                     }
                 });
 
-                // Disable jam selesai yang konflik
-                Array.from(jamSelesaiSelect.options).forEach(option => {
-                    if (!option.value) return;
-                    const hour = parseInt(option.value.split(':')[0]);
-                    if (hour > startHour && hour <= endHour) {
-                        option.disabled = true;
-                        option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
-                    }
+                // Disable jam yang sudah dipesan
+                bookedSchedules.forEach(schedule => {
+                    const startHour = parseInt(schedule.start.split(':')[0]);
+                    const endHour = parseInt(schedule.end.split(':')[0]);
+
+                    // Disable jam mulai yang konflik
+                    Array.from(jamMulaiSelect.options).forEach(option => {
+                        if (!option.value) return;
+                        const hour = parseInt(option.value.split(':')[0]);
+                        if (hour >= startHour && hour < endHour) {
+                            option.disabled = true;
+                            option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                        }
+                    });
+
+                    // Disable jam selesai yang konflik
+                    Array.from(jamSelesaiSelect.options).forEach(option => {
+                        if (!option.value) return;
+                        const hour = parseInt(option.value.split(':')[0]);
+                        if (hour > startHour && hour <= endHour) {
+                            option.disabled = true;
+                            option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                        }
+                    });
                 });
             });
-        });
     }
 </script>
