@@ -344,8 +344,8 @@ class PemesananController extends Controller
     public function getSnapToken(Request $request)
     {
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = false;
-        // \Midtrans\Config::$isProduction = true;
+        // \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$isProduction = true;
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
