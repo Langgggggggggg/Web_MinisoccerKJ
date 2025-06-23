@@ -11,12 +11,6 @@
                 <h2 class="text-2xl font-semibold">
                     <i class="fas fa-calendar-alt mr-2"></i> Form Pemesanan Lapangan
                 </h2>
-                <div class="flex justify-end mt-2">
-                    <button type="button" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 text-sm"
-                        onclick="toggleModal('hargaModal')">
-                        💰 Lihat Daftar Harga
-                    </button>
-                </div>
             </div>
             <div class="p-6">
                 <form action="/pemesanan/store" method="POST" id="bookingForm">
@@ -79,6 +73,14 @@
                         </div>
                     </div>
 
+                    <!-- Tambahkan tampilan harga di sini -->
+                    <div id="hargaInfo" class="mb-6 hidden">
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                            <p class="font-semibold">Total Harga Sewa: <span id="hargaTotalText">Rp 0</span></p>
+                            <p class="text-sm" id="hargaPerJamText"></p>
+                        </div>
+                    </div>
+
                     <div class="mb-6">
                         <label for="nama_tim" class="block text-sm font-medium text-gray-700">
                             <i class="fas fa-users mr-2"></i> Nama Tim:
@@ -122,30 +124,6 @@
             </div>
         </div>
     </div>
-    <div id="hargaModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative flex flex-col">
-            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="toggleModal('hargaModal')">
-                <i class="fas fa-times"></i>
-            </button>
-            <h2 class="text-xl font-bold mb-4 text-emerald-600">Daftar Harga Lapangan</h2>
-
-            <div class="mb-4">
-                <h3 class="font-semibold text-gray-700">Jam 07.00 - 17.00</h3>
-                <ul class="list-disc list-inside text-sm text-gray-600">
-                    <li>Lapangan 1, 2, 3: Rp 300.000</li>
-                    <li>Lapangan 4, 5: Rp 350.000</li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="font-semibold text-gray-700">Jam 17.00 - 23.00</h3>
-                <ul class="list-disc list-inside text-sm text-gray-600">
-                    <li>Lapangan 1, 2, 3: Rp 400.000</li>
-                    <li>Lapangan 4, 5: Rp 450.000</li>
-                </ul>
-            </div>
-        </div>
-    </div>
     <!-- script Snap.js ke production -->
     <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     <!-- script Snap.js ke sandbox -->
@@ -165,7 +143,7 @@
 
             // Validasi DP minimal
             if (formData.dp < 10000) {
-            // if (formData.dp < 100000) {
+                // if (formData.dp < 100000) {
                 Swal.fire({
                     icon: 'error',
                     title: 'DP yang anda bayar kurang',
@@ -301,17 +279,6 @@
                 });
         }
 
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-            }
-        }
-
         function updateAvailableHours() {
             const tanggal = document.querySelector('input[name="tanggal"]').value;
             const lapangan = document.querySelector('select[name="lapangan"]').value;
@@ -379,5 +346,56 @@
         // Tambahkan event listeners
         document.querySelector('input[name="tanggal"]').addEventListener('change', updateAvailableHours);
         document.querySelector('select[name="lapangan"]').addEventListener('change', updateAvailableHours);
+
+        // Fungsi untuk menghitung harga
+        function hitungHarga() {
+            const lapangan = parseInt(document.querySelector('select[name="lapangan"]').value);
+            const jamMulai = document.querySelector('select[name="jam_mulai"]').value;
+            const jamSelesai = document.querySelector('select[name="jam_selesai"]').value;
+
+            if (!lapangan || !jamMulai || !jamSelesai) {
+                document.getElementById('hargaInfo').classList.add('hidden');
+                return;
+            }
+
+            const jamMulaiHour = parseInt(jamMulai.split(':')[0]);
+            const jamSelesaiHour = parseInt(jamSelesai.split(':')[0]);
+            const durasi = jamSelesaiHour - jamMulaiHour;
+
+            if (durasi <= 0) {
+                document.getElementById('hargaInfo').classList.add('hidden');
+                return;
+            }
+
+            let hargaPerJam = 0;
+            let labelHarga = '';
+            if ([1, 2, 3].includes(lapangan)) {
+                if (jamMulaiHour < 17) {
+                    hargaPerJam = 300000;
+                    labelHarga = 'Lapangan 1, 2, 3 (07.00-17.00): Rp 300.000/jam';
+                } else {
+                    hargaPerJam = 350000;
+                    labelHarga = 'Lapangan 1, 2, 3 (17.00-23.00): Rp 350.000/jam';
+                }
+            } else if ([4, 5].includes(lapangan)) {
+                if (jamMulaiHour < 17) {
+                    hargaPerJam = 400000;
+                    labelHarga = 'Lapangan 4, 5 (07.00-17.00): Rp 400.000/jam';
+                } else {
+                    hargaPerJam = 450000;
+                    labelHarga = 'Lapangan 4, 5 (17.00-23.00): Rp 450.000/jam';
+                }
+            }
+
+            const totalHarga = hargaPerJam * durasi;
+            document.getElementById('hargaTotalText').innerText = 'Rp ' + totalHarga.toLocaleString();
+            document.getElementById('hargaPerJamText').innerText = labelHarga;
+            document.getElementById('hargaInfo').classList.remove('hidden');
+        }
+
+        // Event listener untuk update harga otomatis
+        document.querySelector('select[name="lapangan"]').addEventListener('change', hitungHarga);
+        document.querySelector('select[name="jam_mulai"]').addEventListener('change', hitungHarga);
+        document.querySelector('select[name="jam_selesai"]').addEventListener('change', hitungHarga);
     </script>
 @endsection

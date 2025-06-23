@@ -18,7 +18,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-['Poppins'] antialiased bg-white dark:bg-gray-900 dark:text-gray-100">
+<body class="font-['Poppins'] antialiased bg-white ">
 
     {{-- Navbar --}}
     @include('landing_page.partials.navbar')
