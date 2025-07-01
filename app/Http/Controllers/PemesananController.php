@@ -289,7 +289,7 @@ class PemesananController extends Controller
                 'status' => $status,
             ]);
 
-           NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true); // kirim notifikasi update
+            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true); // kirim notifikasi update
             DB::commit();
 
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil diperbarui!');
@@ -349,15 +349,37 @@ class PemesananController extends Controller
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
+        // Buat order ID unik
+        $orderId = strtoupper(substr(uniqid(), -5));
+
+        // Detail produk untuk Midtrans
+        $itemDetails = [
+            [
+                'id' => $orderId,
+                'price' => (int) $request->dp,
+                'quantity' => 1,
+                'name' => 'DP Sewa Lapangan ' . ($request->lapangan ?? ''),
+
+                'brand' => 'Minisoccer KJ',
+                'category' => 'Sewa Lapangan',
+                'merchant_name' => 'Minisoccer KJ',
+                'description' => 'DP sewa lapangan nomor ' . ($request->lapangan ?? '') . 
+                    ' tanggal ' . ($request->tanggal ?? '') . 
+                    ' jam ' . ($request->jam_mulai ?? '') . '-' . ($request->jam_selesai ?? ''),
+
+            ]
+        ];
+
         $params = [
             'transaction_details' => [
-                'order_id' => strtoupper(substr(uniqid(), -5)), // Buat order ID unik
-                'gross_amount' => (int) $request->dp, // Gunakan nilai DP sebagai gross_amount
+                'order_id' => $orderId,
+                'gross_amount' => (int) $request->dp,
             ],
             'customer_details' => [
                 'first_name' => $request->nama_tim,
                 'phone' => $request->no_telepon,
             ],
+            'item_details' => $itemDetails,
         ];
 
         $snapToken = \Midtrans\Snap::getSnapToken($params);
@@ -380,5 +402,41 @@ class PemesananController extends Controller
             });
 
         return response()->json($bookedSchedules);
+    }
+    public function midtransCallback(Request $request)
+    {
+        $notif = $request->all();
+
+        // (Opsional) Validasi signature_key untuk keamanan
+        $serverKey = env('MIDTRANS_SERVER_KEY');
+        $validSignature = hash(
+            'sha512',
+            $notif['order_id'] .
+                $notif['status_code'] .
+                $notif['gross_amount'] .
+                $serverKey
+        );
+        if (isset($notif['signature_key']) && $notif['signature_key'] !== $validSignature) {
+            return response()->json(['message' => 'Invalid signature'], 403);
+        }
+
+        // Proses update status pembayaran
+        $orderId = $notif['order_id'];
+        $status = $notif['transaction_status'];
+        $paymentType = $notif['payment_type'] ?? null;
+        $feeAmount = $notif['fee_amount'] ?? 0;
+
+        $pemesanan = Pemesanan::where('kode_pemesanan', $orderId)->first();
+        if ($pemesanan) {
+            $pemesanan->payment_type = $paymentType;
+            $pemesanan->midtrans_fee = $feeAmount;
+            $pemesanan->midtrans_status = $status;
+            if ($status === 'settlement' || $status === 'capture') {
+                $pemesanan->status = 'lunas';
+            }
+            $pemesanan->save();
+        }
+
+        return response()->json(['message' => 'OK']);
     }
 }

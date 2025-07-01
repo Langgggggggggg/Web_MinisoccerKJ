@@ -46,7 +46,10 @@ Route::get('/informasi/{slug}', [InformationController::class, 'show'])->name('i
 Route::middleware('auth')->group(function () {
     Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');
 });
-
+// ===============================
+// Midtrans Callback (Tanpa Middleware CSRF)
+Route::post('/midtrans/callback', [PemesananController::class, 'midtransCallback'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 // ===============================
 // Pemesanan (Autentikasi)
 // ===============================
