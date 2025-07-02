@@ -18,7 +18,10 @@ class JadwalController extends Controller
         $tanggal = $request->query('tanggal', date('Y-m-d'));
 
         // Ambil semua data pemesanan
-        $rawPemesanan = Pemesanan::orderBy('tanggal')->orderBy('jam_mulai')->get();
+        $rawPemesanan = Pemesanan::where('status', '!=', 'pending')
+            ->orderBy('tanggal')
+            ->orderBy('jam_mulai')
+            ->get();
 
         // Siapkan koleksi baru untuk menyimpan hasil ekspansi jadwal per jam
         $expandedJadwals = collect();

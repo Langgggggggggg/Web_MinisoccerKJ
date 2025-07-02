@@ -41,7 +41,6 @@ class PemesananController extends Controller
             'nama_tim' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
             'dp' => 'required|numeric|min:10000',
-            // 'dp' => 'required|numeric|min:100000',
         ]);
 
         $kode_pemesanan = strtoupper(substr(uniqid(), -5));
@@ -87,18 +86,35 @@ class PemesananController extends Controller
                 'dp' => $dp,
                 'harga' => $total_harga,
                 'sisa_bayar' => $sisa_bayar,
-                'status' => $status,
+                'status' => 'pending',
             ]);
 
-            // Kirim notifikasi WhatsApp untuk detail pemesanan baru
             NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
-            // Kirim notifikasi pengingat pembayaran
             NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
 
             DB::commit();
+
+            // Jika AJAX, return JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'kode_pemesanan' => $pemesanan->kode_pemesanan,
+                    'dp' => $dp,
+                    'nama_tim' => $pemesanan->nama_tim,
+                    'no_telepon' => $pemesanan->no_telepon,
+                    'lapangan' => $pemesanan->lapangan,
+                    'tanggal' => $pemesanan->tanggal,
+                    'jam_mulai' => $pemesanan->jam_mulai,
+                    'jam_selesai' => $pemesanan->jam_selesai,
+                ]);
+            }
+
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil!');
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            }
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
@@ -114,13 +130,15 @@ class PemesananController extends Controller
             'jam_selesai' => 'required|array',
             'nama_tim' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
-            // 'dp' => 'required|numeric|min:100000',
             'dp' => 'required|numeric|min:20000',
         ]);
 
         $user = Auth::user();
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            if ($request->ajax()) {
+                return response()->json(['error' => 'User not authenticated'], 401);
+            }
+            return back()->withErrors(['error' => 'User not authenticated']);
         }
 
         DB::beginTransaction();
@@ -136,11 +154,15 @@ class PemesananController extends Controller
             }
 
             if ($jumlah_jadwal_valid == 0) {
+                if ($request->ajax()) {
+                    return response()->json(['error' => 'Tidak ada jadwal yang valid.'], 422);
+                }
                 return back()->withErrors(['error' => 'Tidak ada jadwal yang valid.']);
             }
 
             $dp_total = $request->dp;
             $dp_per_jadwal = $dp_total / $jumlah_jadwal_valid;
+            $createdPemesanan = [];
 
             foreach ($request->jam_mulai as $index => $mulai) {
                 $selesai = $request->jam_selesai[$index];
@@ -149,6 +171,9 @@ class PemesananController extends Controller
                 if (!$mulai || !$selesai || !$tanggal) continue;
 
                 if (strtotime($selesai) <= strtotime($mulai)) {
+                    if ($request->ajax()) {
+                        return response()->json(['error' => 'Jam selesai harus lebih besar dari jam mulai di jadwal ke-' . ($index + 1)], 422);
+                    }
                     return back()->withErrors(['error' => 'Jam selesai harus lebih besar dari jam mulai di jadwal ke-' . ($index + 1)]);
                 }
 
@@ -175,7 +200,6 @@ class PemesananController extends Controller
                 $dp = $dp_per_jadwal;
                 $total_diskon = 25000 * $durasi;
                 $sisa_bayar = max(0, $total_harga - $dp - $total_diskon);
-                $status = ($sisa_bayar == 0) ? 'lunas' : 'belum lunas';
 
                 $pemesanan = Pemesanan::create([
                     'user_id' => $user->id,
@@ -189,12 +213,12 @@ class PemesananController extends Controller
                     'dp' => $dp,
                     'harga' => $total_harga,
                     'sisa_bayar' => $sisa_bayar,
-                    'status' => $status,
+                    'status' => 'belum lunas',
                 ]);
-
-                // Kirim notifikasi pengingat pembayaran
+                NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
                 NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
                 $lastTanggal = $tanggal;
+                $createdPemesanan[] = $pemesanan;
             }
 
             // Tambahkan status member
@@ -207,9 +231,29 @@ class PemesananController extends Controller
             }
 
             DB::commit();
+
+            if ($request->ajax()) {
+                // Return data pemesanan pertama untuk kebutuhan Snap
+                $first = $createdPemesanan[0] ?? null;
+                return response()->json([
+                    'success' => true,
+                    'kode_pemesanan' => $first ? $first->kode_pemesanan : null,
+                    'dp' => $dp_total, // <-- DP total, bukan per jadwal!
+                    'nama_tim' => $first ? $first->nama_tim : null,
+                    'no_telepon' => $first ? $first->no_telepon : null,
+                    'lapangan' => $first ? $first->lapangan : null,
+                    'tanggal' => $first ? $first->tanggal : null,
+                    'jam_mulai' => $first ? $first->jam_mulai : null,
+                    'jam_selesai' => $first ? $first->jam_selesai : null,
+                ]);
+            }
+
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan member berhasil!');
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            }
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
@@ -344,15 +388,12 @@ class PemesananController extends Controller
     public function getSnapToken(Request $request)
     {
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        // \Midtrans\Config::$isProduction = false;
         \Midtrans\Config::$isProduction = true;
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
-        // Buat order ID unik
-        $orderId = strtoupper(substr(uniqid(), -5));
+        $orderId = $request->order_id; // kode_pemesanan dari database
 
-        // Detail produk untuk Midtrans
         $itemDetails = [
             [
                 'id' => $orderId,
@@ -363,8 +404,8 @@ class PemesananController extends Controller
                 'brand' => 'Minisoccer KJ',
                 'category' => 'Sewa Lapangan',
                 'merchant_name' => 'Minisoccer KJ',
-                'description' => 'DP sewa lapangan nomor ' . ($request->lapangan ?? '') . 
-                    ' tanggal ' . ($request->tanggal ?? '') . 
+                'description' => 'DP sewa lapangan nomor ' . ($request->lapangan ?? '') .
+                    ' tanggal ' . ($request->tanggal ?? '') .
                     ' jam ' . ($request->jam_mulai ?? '') . '-' . ($request->jam_selesai ?? ''),
 
             ]
@@ -405,38 +446,25 @@ class PemesananController extends Controller
     }
     public function midtransCallback(Request $request)
     {
-        $notif = $request->all();
+        $serverKey = config('midtrans.server_key');
+        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
-        // (Opsional) Validasi signature_key untuk keamanan
-        $serverKey = env('MIDTRANS_SERVER_KEY');
-        $validSignature = hash(
-            'sha512',
-            $notif['order_id'] .
-                $notif['status_code'] .
-                $notif['gross_amount'] .
-                $serverKey
-        );
-        if (isset($notif['signature_key']) && $notif['signature_key'] !== $validSignature) {
-            return response()->json(['message' => 'Invalid signature'], 403);
-        }
-
-        // Proses update status pembayaran
-        $orderId = $notif['order_id'];
-        $status = $notif['transaction_status'];
-        $paymentType = $notif['payment_type'] ?? null;
-        $feeAmount = $notif['fee_amount'] ?? 0;
-
-        $pemesanan = Pemesanan::where('kode_pemesanan', $orderId)->first();
-        if ($pemesanan) {
-            $pemesanan->payment_type = $paymentType;
-            $pemesanan->midtrans_fee = $feeAmount;
-            $pemesanan->midtrans_status = $status;
-            if ($status === 'settlement' || $status === 'capture') {
-                $pemesanan->status = 'lunas';
+        if ($hashed == $request->signature_key) {
+            $pemesanan = Pemesanan::where('kode_pemesanan', $request->order_id)->first();
+            if ($pemesanan) {
+                if (
+                    $request->transaction_status == 'capture' ||
+                    $request->transaction_status == 'settlement'
+                ) {
+                    // Pembayaran sukses, cek sisa bayar
+                    $pemesanan->status = ($pemesanan->sisa_bayar <= 0) ? 'lunas' : 'belum lunas';
+                } elseif ($request->transaction_status == 'pending') {
+                    // User baru memilih metode pembayaran, status tetap pending
+                    $pemesanan->status = 'pending';
+                }
+                $pemesanan->save();
             }
-            $pemesanan->save();
         }
-
         return response()->json(['message' => 'OK']);
     }
 }

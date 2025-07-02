@@ -13,7 +13,7 @@
                 </h2>
             </div>
             <div class="p-6">
-                <form action="/pemesanan/store" method="POST" id="bookingForm">
+                <form id="bookingForm">
                     @csrf
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
@@ -23,7 +23,7 @@
                             </label>
                             <input type="date" name="tanggal" id="tanggal"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                required autocomplete="off">
+                                required autocomplete="off" onchange="updateAvailableHours()">
                         </div>
 
                         <div>
@@ -32,7 +32,7 @@
                             </label>
                             <select name="lapangan" id="lapangan"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                required>
+                                required onchange="updateAvailableHours()">
                                 <option value="" disabled selected>Pilih Lapangan</option>
                                 <option value="1">Lapangan 1</option>
                                 <option value="2">Lapangan 2</option>
@@ -57,7 +57,6 @@
                                 @endfor
                             </select>
                         </div>
-
                         <div>
                             <label for="jam_selesai" class="block text-sm font-medium text-gray-700">
                                 <i class="fas fa-clock mr-2"></i> Jam Selesai:
@@ -72,7 +71,6 @@
                             </select>
                         </div>
                     </div>
-
                     <!-- Tambahkan tampilan harga di sini -->
                     <div id="hargaInfo" class="mb-6 hidden">
                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
@@ -80,7 +78,6 @@
                             <p class="text-sm" id="hargaPerJamText"></p>
                         </div>
                     </div>
-
                     <div class="mb-6">
                         <label for="nama_tim" class="block text-sm font-medium text-gray-700">
                             <i class="fas fa-users mr-2"></i> Nama Tim:
@@ -108,11 +105,10 @@
                             required placeholder="Minimal DP Rp 100.000">
                         <span id="dpWarning" class="text-red-500 text-sm mt-2 hidden">Minimal DP Rp 100.000!</span>
                     </div>
-
                     <div class="mb-6 flex justify-end space-x-2">
                         <button type="button"
                             class="bg-emerald-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                            onclick="processPayment()">
+                            id="btnPesan">
                             <i class="fas fa-credit-card mr-2"></i> Pesan
                         </button>
                         <a href="{{ route('dashboard') }}"
@@ -130,7 +126,8 @@
     {{-- <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"> --}}
     </script>
     <script>
-        function processPayment() {
+        document.getElementById('btnPesan').addEventListener('click', function() {
+            // Ambil data form
             let formData = {
                 tanggal: document.querySelector('input[name="tanggal"]').value,
                 lapangan: document.querySelector('select[name="lapangan"]').value,
@@ -141,142 +138,150 @@
                 dp: parseInt(document.querySelector('input[name="dp"]').value),
             };
 
-            // Validasi DP minimal
-            if (formData.dp < 10000) {
-                // if (formData.dp < 100000) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'DP yang anda bayar kurang',
-                    text: 'Minimal DP yang harus dibayar adalah Rp 100.000!',
-                });
+            // Validasi frontend
+            if (!formData.tanggal || !formData.lapangan || !formData.jam_mulai || !formData.jam_selesai || !formData
+                .nama_tim || !formData.no_telepon || !formData.dp) {
+                Swal.fire('Gagal!', 'Semua field wajib diisi.', 'error');
                 return;
             }
-
+            if (formData.dp < 100000) {
+                Swal.fire('Gagal!', 'Minimal DP Rp 100.000!', 'error');
+                return;
+            }
             const [jamMulaiHour, jamMulaiMinute] = formData.jam_mulai.split(":").map(Number);
             const [jamSelesaiHour, jamSelesaiMinute] = formData.jam_selesai.split(":").map(Number);
-
-            // Cek menit jam mulai
-            if (jamMulaiMinute !== 0) {
-                const contohJamMulai = `${jamMulaiHour.toString().padStart(2, '0')}:00`;
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Jam Mulai Tidak Valid',
-                    text: `Jam mulai yang Anda masukkan adalah ${formData.jam_mulai}. Jam mulai harus tepat di menit 00, misalnya ${contohJamMulai}.`,
-                });
+            if (jamMulaiMinute !== 0 || jamSelesaiMinute !== 0) {
+                Swal.fire('Gagal!', 'Jam mulai dan selesai harus tepat di menit 00.', 'error');
                 return;
             }
-
-            // Cek menit jam selesai
-            if (jamSelesaiMinute !== 0) {
-                const contohJamSelesai = `${jamSelesaiHour.toString().padStart(2, '0')}:00`;
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Jam Selesai Tidak Valid',
-                    text: `Jam selesai yang Anda masukkan adalah ${formData.jam_selesai}. Jam selesai harus tepat di menit 00, misalnya ${contohJamSelesai}.`,
-                });
-                return;
-            }
-
-            // Cek urutan jam
             if (jamSelesaiHour <= jamMulaiHour) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Durasi Tidak Valid',
-                    text: `Jam mulai: ${formData.jam_mulai} dan jam selesai: ${formData.jam_selesai}. Jam selesai harus lebih besar dari jam mulai.`,
-                });
+                Swal.fire('Gagal!', 'Jam selesai harus lebih besar dari jam mulai.', 'error');
                 return;
             }
 
-            // Hitung durasi seperti biasa
-            const jamMulai = jamMulaiHour;
-            const jamSelesai = jamSelesaiHour;
-            const durasi = jamSelesai - jamMulai;
-
-
-            let hargaPerJam = 0;
-            const lap = parseInt(formData.lapangan);
-
-            if ([1, 2, 3].includes(lap)) {
-                hargaPerJam = jamMulai < 17 ? 300000 : 350000;
-            } else if ([4, 5].includes(lap)) {
-                hargaPerJam = jamMulai < 17 ? 400000 : 450000;
-            }
-
-            const totalBiaya = hargaPerJam * durasi;
-
-            // Jika DP melebihi total biaya, langsung tolak
-            if (formData.dp > totalBiaya) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'DP Terlalu Besar',
-                    html: `Total biaya sewa lapangan adalah <b>Rp ${totalBiaya.toLocaleString()}</b><br>
-                   DP yang Anda masukkan: <b>Rp ${formData.dp.toLocaleString()}</b><br><br>
-                   DP yang anda masukkan melebihi total biaya sewa lapangan, silahkan masukkan DP yang sesuai.`,
-                });
-                return;
-            }
-
-            // Lanjut proses pembayaran
-            lanjutkanPembayaran(formData);
-        }
-
-        function lanjutkanPembayaran(formData) {
             Swal.fire({
                 icon: 'info',
                 title: 'Mohon Tunggu',
-                text: 'Sedang memproses pembayaran...',
+                text: 'Menyimpan data pemesanan...',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            fetch("/pemesanan/validateSchedule", {
+            fetch("/pemesanan/store", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "X-Requested-With": "XMLHttpRequest"
                     },
                     body: JSON.stringify(formData),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        return fetch("/pemesanan/getSnapToken", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            },
-                            body: JSON.stringify({
-                                dp: formData.dp,
-                                nama_tim: formData.nama_tim,
-                                no_telepon: formData.no_telepon
-                            })
-                        });
-                    } else {
-                        Swal.fire('Gagal!', data.message, 'error');
-                        throw new Error('Jadwal tidak tersedia');
+                .then(async response => {
+                    if (!response.ok) {
+                        let err = await response.json();
+                        throw new Error(err.error || 'Gagal menyimpan pemesanan.');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        Swal.fire('Gagal!', data.error || 'Gagal menyimpan pemesanan.', 'error');
+                        throw new Error(data.error || 'Gagal menyimpan pemesanan.');
+                    }
+                    // Setelah tersimpan, lanjut Snap Midtrans
+                    return fetch("/pemesanan/getSnapToken", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        },
+                        body: JSON.stringify({
+                            order_id: data.kode_pemesanan,
+                            dp: data.dp,
+                            nama_tim: data.nama_tim,
+                            no_telepon: data.no_telepon,
+                            lapangan: data.lapangan,
+                            tanggal: data.tanggal,
+                            jam_mulai: data.jam_mulai,
+                            jam_selesai: data.jam_selesai,
+                        })
+                    });
                 })
                 .then(response => response.json())
                 .then(data => {
                     Swal.close();
+                    if (!data.snapToken) {
+                        Swal.fire('Gagal!', 'Gagal mendapatkan token pembayaran.', 'error');
+                        return;
+                    }
                     snap.pay(data.snapToken, {
                         onSuccess: function(result) {
-                            document.getElementById('bookingForm').submit();
+                            Swal.fire('Berhasil!', 'Pembayaran berhasil.', 'success').then(() => {
+                                window.location.href =
+                                    "{{ route('pemesanan.detail') }}?success=1";
+                            });
                         },
                         onPending: function(result) {
-                            Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.', 'info');
+                            Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.',
+                                'info');
                         },
                         onError: function(result) {
-                            Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error');
+                            Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error').then(
+                                () => {
+                                    window.location.href =
+                                        "{{ route('pemesanan.detail') }}?error=1";
+                                });
                         }
                     });
                 })
                 .catch(error => {
+                    Swal.close();
+                    Swal.fire('Gagal!', error.message, 'error');
                     console.error("Error:", error);
                 });
+        });
+
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function hitungHarga() {
+            const lapangan = document.querySelector('select[name="lapangan"]').value;
+            const jamMulai = document.querySelector('select[name="jam_mulai"]').value;
+            const jamSelesai = document.querySelector('select[name="jam_selesai"]').value;
+
+            if (!lapangan || !jamMulai || !jamSelesai) {
+                document.getElementById('hargaInfo').classList.add('hidden');
+                return;
+            }
+
+            const mulai = parseInt(jamMulai.split(':')[0]);
+            const selesai = parseInt(jamSelesai.split(':')[0]);
+            let durasi = selesai - mulai;
+            if (durasi <= 0) {
+                document.getElementById('hargaInfo').classList.add('hidden');
+                return;
+            }
+
+            let hargaTotal = 0;
+            let hargaPerJamArr = [];
+            for (let i = 0; i < durasi; i++) {
+                let jam = mulai + i;
+                let hargaPerJam = 0;
+                if (lapangan >= 1 && lapangan <= 3) {
+                    hargaPerJam = (jam >= 7 && jam < 17) ? 300000 : 350000;
+                } else if (lapangan >= 4 && lapangan <= 5) {
+                    hargaPerJam = (jam >= 7 && jam < 17) ? 400000 : 450000;
+                }
+                hargaTotal += hargaPerJam;
+                hargaPerJamArr.push(`Jam ${jam}:00 - ${jam+1}:00 = ${formatRupiah(hargaPerJam)}`);
+            }
+
+            document.getElementById('hargaTotalText').innerText = formatRupiah(hargaTotal);
+            document.getElementById('hargaPerJamText').innerHTML = hargaPerJamArr.join('<br>');
+            document.getElementById('hargaInfo').classList.remove('hidden');
         }
 
         function updateAvailableHours() {
@@ -298,20 +303,20 @@
                 })
                 .then(response => response.json())
                 .then(bookedSchedules => {
-                    const jamMulaiSelect = document.querySelector('select[name="jam_mulai"]');
-                    const jamSelesaiSelect = document.querySelector('select[name="jam_selesai"]');
+                    const jamMulaiSelect = document.getElementById('jam_mulai');
+                    const jamSelesaiSelect = document.getElementById('jam_selesai');
 
                     // Reset semua options
                     Array.from(jamMulaiSelect.options).forEach(option => {
                         if (option.value) {
                             option.disabled = false;
-                            option.title = ''; // Reset tooltip
+                            option.title = '';
                         }
                     });
                     Array.from(jamSelesaiSelect.options).forEach(option => {
                         if (option.value) {
                             option.disabled = false;
-                            option.title = ''; // Reset tooltip
+                            option.title = '';
                         }
                     });
 
@@ -343,59 +348,9 @@
                 });
         }
 
-        // Tambahkan event listeners
-        document.querySelector('input[name="tanggal"]').addEventListener('change', updateAvailableHours);
-        document.querySelector('select[name="lapangan"]').addEventListener('change', updateAvailableHours);
-
-        // Fungsi untuk menghitung harga
-        function hitungHarga() {
-            const lapangan = parseInt(document.querySelector('select[name="lapangan"]').value);
-            const jamMulai = document.querySelector('select[name="jam_mulai"]').value;
-            const jamSelesai = document.querySelector('select[name="jam_selesai"]').value;
-
-            if (!lapangan || !jamMulai || !jamSelesai) {
-                document.getElementById('hargaInfo').classList.add('hidden');
-                return;
-            }
-
-            const jamMulaiHour = parseInt(jamMulai.split(':')[0]);
-            const jamSelesaiHour = parseInt(jamSelesai.split(':')[0]);
-            const durasi = jamSelesaiHour - jamMulaiHour;
-
-            if (durasi <= 0) {
-                document.getElementById('hargaInfo').classList.add('hidden');
-                return;
-            }
-
-            let hargaPerJam = 0;
-            let labelHarga = '';
-            if ([1, 2, 3].includes(lapangan)) {
-                if (jamMulaiHour < 17) {
-                    hargaPerJam = 300000;
-                    labelHarga = 'Lapangan 1, 2, 3 (07.00-17.00): Rp 300.000/jam';
-                } else {
-                    hargaPerJam = 350000;
-                    labelHarga = 'Lapangan 1, 2, 3 (17.00-23.00): Rp 350.000/jam';
-                }
-            } else if ([4, 5].includes(lapangan)) {
-                if (jamMulaiHour < 17) {
-                    hargaPerJam = 400000;
-                    labelHarga = 'Lapangan 4, 5 (07.00-17.00): Rp 400.000/jam';
-                } else {
-                    hargaPerJam = 450000;
-                    labelHarga = 'Lapangan 4, 5 (17.00-23.00): Rp 450.000/jam';
-                }
-            }
-
-            const totalHarga = hargaPerJam * durasi;
-            document.getElementById('hargaTotalText').innerText = 'Rp ' + totalHarga.toLocaleString();
-            document.getElementById('hargaPerJamText').innerText = labelHarga;
-            document.getElementById('hargaInfo').classList.remove('hidden');
-        }
-
-        // Event listener untuk update harga otomatis
-        document.querySelector('select[name="lapangan"]').addEventListener('change', hitungHarga);
-        document.querySelector('select[name="jam_mulai"]').addEventListener('change', hitungHarga);
-        document.querySelector('select[name="jam_selesai"]').addEventListener('change', hitungHarga);
+        // Event listener untuk select
+        ['lapangan', 'jam_mulai', 'jam_selesai'].forEach(id => {
+            document.getElementById(id).addEventListener('change', hitungHarga);
+        });
     </script>
 @endsection

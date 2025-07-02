@@ -67,7 +67,7 @@
                                         Rp{{ number_format($pesan->sisa_bayar, 0, ',', '.') }}</td>
                                     <td class="px-4 py-2 border-b" rowspan="{{ count($pemesans) }}">
                                         <span
-                                            class="inline-block text-xs md:text-sm font-medium {{ $pesan->status == 'lunas' ? 'bg-green-500' : 'bg-yellow-500' }} text-white px-3 py-1 rounded-md shadow whitespace-nowrap">
+                                            class="inline-block text-xs md:text-sm font-medium {{ $pesan->status == 'lunas' ? 'bg-green-500' : ($pesan->status == 'belum lunas' ? 'bg-yellow-500' : 'bg-red-500') }} text-white px-3 py-1 rounded-md shadow whitespace-nowrap">
                                             {{ ucfirst($pesan->status) }}
                                         </span>
                                     </td>
@@ -107,23 +107,60 @@
     <!-- Sweet Alert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if (session('success'))
-        <script>
+    <script>
+        // Pesan dari session flash (redirect backend)
+        @if (session('success'))
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: "{{ session('success') }}"
+                text: @json(session('success'))
             });
-        </script>
-    @endif
+        @endif
 
-    @if (session('error'))
-        <script>
+        @if (session('error'))
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal!',
-                text: "{{ session('error') }}"
+                text: @json(session('error'))
             });
-        </script>
-    @endif
+        @endif
+
+        // Pesan dari query string (redirect JS)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'member') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Pemesanan member berhasil!'
+            });
+            if (window.history.replaceState) {
+                const url = new URL(window.location);
+                url.searchParams.delete('success');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }
+        } else if (urlParams.get('success') === 'reguler' || urlParams.get('success') === '1') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Pemesanan berhasil!'
+            });
+            if (window.history.replaceState) {
+                const url = new URL(window.location);
+                url.searchParams.delete('success');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }
+        }
+        if (urlParams.get('error') === '1') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Pemesanan gagal!'
+            });
+            if (window.history.replaceState) {
+                const url = new URL(window.location);
+                url.searchParams.delete('error');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }
+        }
+    </script>
 @endsection

@@ -10,8 +10,7 @@
             <div class="bg-emerald-600 px-6 py-4">
                 <h2 class="text-xl font-bold text-white">Form Pemesanan Lapangan (Member)</h2>
             </div>
-
-            <form id="bookingFormMember" action="{{ route('pemesanan.storeMember') }}" method="POST" class="p-6">
+            <form id="bookingFormMember" autocomplete="off" class="p-6">
                 @csrf
 
                 <!-- Pilihan Lapangan -->
@@ -31,11 +30,9 @@
                 <!-- Jadwal -->
                 <div class="space-y-6 mb-6">
                     <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Jadwal Pemesanan</h3>
-
                     @for ($i = 0; $i < 4; $i++)
                         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
                             <h4 class="text-md font-medium text-emerald-700 mb-3">Jadwal {{ $i + 1 }}</h4>
-
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label for="tanggal_{{ $i }}"
@@ -44,7 +41,6 @@
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
                                         onchange="updateAvailableHoursMember({{ $i }})">
                                 </div>
-
                                 <div>
                                     <label for="jam_mulai_{{ $i }}"
                                         class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
@@ -57,7 +53,6 @@
                                         @endfor
                                     </select>
                                 </div>
-
                                 <div>
                                     <label for="jam_selesai_{{ $i }}"
                                         class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
@@ -78,7 +73,6 @@
                 <!-- Informasi Tim -->
                 <div class="space-y-6 mb-6">
                     <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Informasi Tim</h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="nama_tim" class="block text-sm font-medium text-gray-700 mb-1">Nama Tim</label>
@@ -86,7 +80,6 @@
                                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
                                 required>
                         </div>
-
                         <div>
                             <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">No Telepon</label>
                             <input type="text" name="no_telepon"
@@ -111,7 +104,7 @@
 
                 <!-- Tombol Submit -->
                 <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="prosesPembayaranMember()"
+                    <button type="button" id="btnPesanMember"
                         class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
                         Pesan Sekarang
                     </button>
@@ -125,160 +118,113 @@
     </div>
 @endsection
 <!-- script Snap.js ke production -->
-<script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+{{-- <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script> --}}
 <!-- script Snap.js ke sandbox -->
-{{-- <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"> --}}
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
 </script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Event listener untuk perubahan lapangan
-        const lapanganSelect = document.querySelector('select[name="lapangan"]');
-        if (lapanganSelect) {
-            lapanganSelect.addEventListener('change', () => {
-                // Update semua jadwal ketika lapangan berubah
-                for (let i = 0; i < 4; i++) {
-                    const tanggalInput = document.querySelector(
-                        `input[name="tanggal[]"][id="tanggal_${i}"]`);
-                    if (tanggalInput && tanggalInput.value) {
-                        updateAvailableHoursMember(i);
-                    }
+        const btnPesan = document.getElementById('btnPesanMember');
+        if (!btnPesan) return;
+
+        btnPesan.addEventListener('click', function() {
+            // Ambil data form
+            let tanggal = Array.from(document.querySelectorAll('input[name="tanggal[]"]')).map(e => e.value);
+            let jam_mulai = Array.from(document.querySelectorAll('select[name="jam_mulai[]"]')).map(e => e.value);
+            let jam_selesai = Array.from(document.querySelectorAll('select[name="jam_selesai[]"]')).map(e => e.value);
+            let lapangan = document.querySelector('select[name="lapangan"]').value;
+            let nama_tim = document.querySelector('input[name="nama_tim"]').value;
+            let no_telepon = document.querySelector('input[name="no_telepon"]').value;
+            let dp = parseInt(document.querySelector('input[name="dp"]').value);
+
+            // Validasi minimal satu jadwal terisi
+            let validJadwal = false;
+            for (let i = 0; i < tanggal.length; i++) {
+                if (tanggal[i] && jam_mulai[i] && jam_selesai[i]) {
+                    validJadwal = true;
+                    break;
                 }
-            });
-        }
-
-        // Event listener untuk setiap input tanggal
-        for (let i = 0; i < 4; i++) {
-            const tanggalInput = document.querySelector(`input[name="tanggal[]"][id="tanggal_${i}"]`);
-            if (tanggalInput) {
-                tanggalInput.addEventListener('change', () => {
-                    updateAvailableHoursMember(i);
-                });
             }
-        }
-    });
-
-    function prosesPembayaranMember() {
-        const formElements = {
-            tanggal: document.querySelector('input[name="tanggal[]"]'),
-            lapangan: document.querySelector('select[name="lapangan"]'),
-            jamMulai: document.querySelector('select[name="jam_mulai[]"]'), // Ubah ke select
-            jamSelesai: document.querySelector('select[name="jam_selesai[]"]'), // Ubah ke select
-            namaTim: document.querySelector('input[name="nama_tim"]'),
-            noTelepon: document.querySelector('input[name="no_telepon"]'),
-            dp: document.querySelector('input[name="dp"]')
-        };
-
-        // Validasi semua elemen form ada
-        for (const [key, element] of Object.entries(formElements)) {
-            if (!element) {
-                Swal.fire('Error', `Form ${key} tidak ditemukan`, 'error');
+            if (!validJadwal) {
+                Swal.fire('Gagal!', 'Minimal satu jadwal harus diisi lengkap.', 'error');
                 return;
             }
-        }
 
-        let formData = {
-            tanggal: formElements.tanggal.value,
-            lapangan: formElements.lapangan.value,
-            jam_mulai: formElements.jamMulai.value,
-            jam_selesai: formElements.jamSelesai.value,
-            nama_tim: formElements.namaTim.value,
-            no_telepon: formElements.noTelepon.value,
-            dp: parseInt(formElements.dp.value || 0)
-        };
-
-        // Validasi form terisi
-        if (!formData.tanggal || !formData.jam_mulai || !formData.jam_selesai ||
-            !formData.nama_tim || !formData.no_telepon || !formData.dp) {
-            Swal.fire('Error', 'Mohon lengkapi semua field yang diperlukan', 'error');
-            return;
-        }
-
-        const [jamMulaiHour, jamMulaiMinute] = formData.jam_mulai.split(":").map(Number);
-        const [jamSelesaiHour, jamSelesaiMinute] = formData.jam_selesai.split(":").map(Number);
-
-        // Validasi menit jam mulai
-        if (jamMulaiMinute !== 0) {
-            const contohJamMulai = `${jamMulaiHour.toString().padStart(2, '0')}:00`;
-            Swal.fire({
-                icon: 'error',
-                title: 'Jam Mulai Tidak Valid',
-                text: `Jam mulai yang Anda masukkan adalah ${formData.jam_mulai}. Jam mulai harus tepat di menit 00, misalnya ${contohJamMulai}.`,
-            });
-            return;
-        }
-
-        // Validasi menit jam selesai
-        if (jamSelesaiMinute !== 0) {
-            const contohJamSelesai = `${jamSelesaiHour.toString().padStart(2, '0')}:00`;
-            Swal.fire({
-                icon: 'error',
-                title: 'Jam Selesai Tidak Valid',
-                text: `Jam selesai yang Anda masukkan adalah ${formData.jam_selesai}. Jam selesai harus tepat di menit 00, misalnya ${contohJamSelesai}.`,
-            });
-            return;
-        }
-
-        // Validasi urutan jam
-        if (jamSelesaiHour <= jamMulaiHour) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Durasi Tidak Valid',
-                text: `Jam selesai harus lebih besar dari jam mulai. Anda mengisi jam mulai: ${formData.jam_mulai}, jam selesai: ${formData.jam_selesai}.`,
-            });
-            return;
-        }
-
-        // Validasi durasi harus kelipatan 1 jam
-        const durasi = jamSelesaiHour - jamMulaiHour;
-        if (durasi % 1 !== 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Durasi Tidak Valid',
-                text: `Durasi sewa harus genap per jam (1 jam, 2 jam, dst). Saat ini Anda mengisi dari ${formData.jam_mulai} sampai ${formData.jam_selesai} yang berdurasi ${durasi} jam.`,
-            });
-            return;
-        }
-
-        // Validasi DP minimal
-        if (formData.dp < 20000) {
-            // if (formData.dp < 400000) {
-            Swal.fire({
-                icon: 'error',
-                title: 'DP yang Anda bayar kurang',
-                text: 'Minimal DP yang harus dibayar adalah Rp 400.000!',
-            });
-            return;
-        }
-
-        // Jika semua valid, lanjutkan
-        lanjutkanPembayaranMember(formData);
-
-
-    }
-
-    function lanjutkanPembayaranMember(formData) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Mohon Tunggu',
-            text: 'Sedang memproses pembayaran...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+            // Validasi field utama
+            if (!lapangan || !nama_tim || !no_telepon || !dp) {
+                Swal.fire('Gagal!', 'Semua field wajib diisi.', 'error');
+                return;
             }
-        });
+            if (dp < 400000) {
+                Swal.fire('Gagal!', 'Minimal DP Rp 400.000!', 'error');
+                return;
+            }
 
-        fetch("/pemesanan/validateSchedule", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                },
-                body: JSON.stringify(formData),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            // Validasi jam dan tanggal tiap jadwal
+            for (let i = 0; i < tanggal.length; i++) {
+                if (tanggal[i] || jam_mulai[i] || jam_selesai[i]) {
+                    if (!tanggal[i] || !jam_mulai[i] || !jam_selesai[i]) {
+                        Swal.fire('Gagal!', `Jadwal ke-${i + 1} belum lengkap.`, 'error');
+                        return;
+                    }
+                    const [jamMulaiHour, jamMulaiMinute] = jam_mulai[i].split(":").map(Number);
+                    const [jamSelesaiHour, jamSelesaiMinute] = jam_selesai[i].split(":").map(Number);
+                    if (jamMulaiMinute !== 0 || jamSelesaiMinute !== 0) {
+                        Swal.fire('Gagal!',
+                            `Jam mulai/selesai pada jadwal ke-${i + 1} harus tepat di menit 00.`,
+                            'error');
+                        return;
+                    }
+                    if (jamSelesaiHour <= jamMulaiHour) {
+                        Swal.fire('Gagal!',
+                            `Jam selesai harus lebih besar dari jam mulai pada jadwal ke-${i + 1}.`,
+                            'error');
+                        return;
+                    }
+                }
+            }
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Mohon Tunggu',
+                text: 'Menyimpan data pemesanan...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Kirim data ke backend via AJAX
+            fetch("/pemesanan/member", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({
+                        tanggal: tanggal,
+                        lapangan: lapangan,
+                        jam_mulai: jam_mulai,
+                        jam_selesai: jam_selesai,
+                        nama_tim: nama_tim,
+                        no_telepon: no_telepon,
+                        dp: dp
+                    }),
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        let err = await response.json();
+                        throw new Error(err.error || 'Gagal menyimpan pemesanan.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        Swal.fire('Gagal!', data.error || 'Gagal menyimpan pemesanan.', 'error');
+                        throw new Error(data.error || 'Gagal menyimpan pemesanan.');
+                    }
+                    // Setelah tersimpan, lanjut Snap Midtrans
                     return fetch("/pemesanan/getSnapToken", {
                         method: "POST",
                         headers: {
@@ -286,99 +232,115 @@
                             "X-CSRF-TOKEN": "{{ csrf_token() }}",
                         },
                         body: JSON.stringify({
-                            dp: formData.dp,
-                            nama_tim: formData.nama_tim,
-                            no_telepon: formData.no_telepon
+                            order_id: data.kode_pemesanan,
+                            dp: data.dp,
+                            nama_tim: data.nama_tim,
+                            no_telepon: data.no_telepon,
+                            lapangan: data.lapangan,
+                            tanggal: data.tanggal,
+                            jam_mulai: data.jam_mulai,
+                            jam_selesai: data.jam_selesai,
                         })
                     });
-                } else {
-                    Swal.fire('Gagal!', data.message, 'error');
-                    throw new Error('Jadwal tidak tersedia');
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close();
-                snap.pay(data.snapToken, {
-                    onSuccess: function(result) {
-                        document.getElementById('bookingFormMember').submit();
-                    },
-                    onPending: function(result) {
-                        Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.', 'info');
-                    },
-                    onError: function(result) {
-                        Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error');
-                    }
-                });
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    }
-
-    function updateAvailableHoursMember(index) {
-        const tanggal = document.querySelector(`input[name="tanggal[]"][id="tanggal_${index}"]`).value;
-        const lapangan = document.querySelector('select[name="lapangan"]').value;
-
-        if (!tanggal || !lapangan) return;
-
-        fetch('/pemesanan/getBookedSchedules', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    tanggal,
-                    lapangan
                 })
-            })
-            .then(response => response.json())
-            .then(bookedSchedules => {
-                const jamMulaiSelect = document.querySelector(
-                `select[name="jam_mulai[]"][id="jam_mulai_${index}"]`);
-                const jamSelesaiSelect = document.querySelector(
-                    `select[name="jam_selesai[]"][id="jam_selesai_${index}"]`);
-
-                // Reset semua options
-                Array.from(jamMulaiSelect.options).forEach(option => {
-                    if (option.value) {
-                        option.disabled = false;
-                        option.title = '';
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    if (!data.snapToken) {
+                        Swal.fire('Gagal!', 'Gagal mendapatkan token pembayaran.', 'error');
+                        return;
                     }
+                    snap.pay(data.snapToken, {
+                        onSuccess: function(result) {
+                            Swal.fire('Berhasil!', 'Pembayaran berhasil.', 'success')
+                                .then(() => {
+                                    window.location.href = "{{ route('pemesanan.detail') }}?success=member";
+                                });
+                        },
+                        onPending: function(result) {
+                            Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.', 'info');
+                        },
+                        onError: function(result) {
+                            Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error')
+                                .then(() => {
+                                    window.location.href = "{{ route('pemesanan.detail') }}?error=1";
+                                });
+                        }
+                    });
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire('Gagal!', error.message, 'error');
+                    console.error("Error:", error);
                 });
-                Array.from(jamSelesaiSelect.options).forEach(option => {
-                    if (option.value) {
-                        option.disabled = false;
-                        option.title = '';
-                    }
-                });
+        });
 
-                // Disable jam yang sudah dipesan
-                bookedSchedules.forEach(schedule => {
-                    const startHour = parseInt(schedule.start.split(':')[0]);
-                    const endHour = parseInt(schedule.end.split(':')[0]);
+        window.updateAvailableHoursMember = function(index) {
+            const tanggal = document.querySelector(`input[name="tanggal[]"][id="tanggal_${index}"]`).value;
+            const lapangan = document.querySelector('select[name="lapangan"]').value;
 
-                    // Disable jam mulai yang konflik
+            if (!tanggal || !lapangan) return;
+
+            fetch('/pemesanan/getBookedSchedules', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        tanggal,
+                        lapangan
+                    })
+                })
+                .then(response => response.json())
+                .then(bookedSchedules => {
+                    const jamMulaiSelect = document.querySelector(
+                        `select[name="jam_mulai[]"][id="jam_mulai_${index}"]`);
+                    const jamSelesaiSelect = document.querySelector(
+                        `select[name="jam_selesai[]"][id="jam_selesai_${index}"]`);
+
+                    // Reset semua options
                     Array.from(jamMulaiSelect.options).forEach(option => {
-                        if (!option.value) return;
-                        const hour = parseInt(option.value.split(':')[0]);
-                        if (hour >= startHour && hour < endHour) {
-                            option.disabled = true;
-                            option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
+                        if (option.value) {
+                            option.disabled = false;
+                            option.title = '';
+                        }
+                    });
+                    Array.from(jamSelesaiSelect.options).forEach(option => {
+                        if (option.value) {
+                            option.disabled = false;
+                            option.title = '';
                         }
                     });
 
-                    // Disable jam selesai yang konflik
-                    Array.from(jamSelesaiSelect.options).forEach(option => {
-                        if (!option.value) return;
-                        const hour = parseInt(option.value.split(':')[0]);
-                        if (hour > startHour && hour <= endHour) {
-                            option.disabled = true;
-                            option.title = `Jam ${option.value} sudah dipesan oleh tim lain`;
-                        }
+                    // Disable jam yang sudah dipesan
+                    bookedSchedules.forEach(schedule => {
+                        const startHour = parseInt(schedule.start.split(':')[0]);
+                        const endHour = parseInt(schedule.end.split(':')[0]);
+
+                        // Disable jam mulai yang konflik
+                        Array.from(jamMulaiSelect.options).forEach(option => {
+                            if (!option.value) return;
+                            const hour = parseInt(option.value.split(':')[0]);
+                            if (hour >= startHour && hour < endHour) {
+                                option.disabled = true;
+                                option.title =
+                                    `Jam ${option.value} sudah dipesan oleh tim lain`;
+                            }
+                        });
+
+                        // Disable jam selesai yang konflik
+                        Array.from(jamSelesaiSelect.options).forEach(option => {
+                            if (!option.value) return;
+                            const hour = parseInt(option.value.split(':')[0]);
+                            if (hour > startHour && hour <= endHour) {
+                                option.disabled = true;
+                                option.title =
+                                    `Jam ${option.value} sudah dipesan oleh tim lain`;
+                            }
+                        });
                     });
                 });
-            });
-    }
+        }
+    });
 </script>

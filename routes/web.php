@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });;
 
+
 Route::middleware(['auth'])->group(function () {});
 Route::get('/informasi', [InformationController::class, 'publicIndex'])->name('landing.information.index');
 // Halaman informasi detail publik
