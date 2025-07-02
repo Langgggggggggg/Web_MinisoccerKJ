@@ -155,7 +155,7 @@
                 Swal.fire('Gagal!', 'Semua field wajib diisi.', 'error');
                 return;
             }
-            if (dp < 400000) {
+            if (dp < 20000) {
                 Swal.fire('Gagal!', 'Minimal DP Rp 400.000!', 'error');
                 return;
             }
