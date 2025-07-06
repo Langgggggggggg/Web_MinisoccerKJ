@@ -89,8 +89,8 @@ class PemesananController extends Controller
                 'status' => 'pending',
             ]);
 
-           
-            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
+
+            // NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
 
             DB::commit();
 
@@ -215,8 +215,8 @@ class PemesananController extends Controller
                     'sisa_bayar' => $sisa_bayar,
                     'status' => 'belum lunas',
                 ]);
-                
-                NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
+
+                // NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
                 $lastTanggal = $tanggal;
                 $createdPemesanan[] = $pemesanan;
             }
@@ -459,6 +459,7 @@ class PemesananController extends Controller
                     // Pembayaran sukses, cek sisa bayar
                     $pemesanan->status = ($pemesanan->sisa_bayar <= 0) ? 'lunas' : 'belum lunas';
                     NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
+                    NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
                 } elseif ($request->transaction_status == 'pending') {
                     // User baru memilih metode pembayaran, status tetap pending
                     $pemesanan->status = 'pending';
