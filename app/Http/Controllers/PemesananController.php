@@ -458,8 +458,28 @@ class PemesananController extends Controller
                 ) {
                     // Pembayaran sukses, cek sisa bayar
                     $pemesanan->status = ($pemesanan->sisa_bayar <= 0) ? 'lunas' : 'belum lunas';
-                    NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
-                    NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
+
+                    // Cek apakah pesanan ini adalah pesanan member
+                    if (str_starts_with($pemesanan->kode_pemesanan, 'MBR-')) {
+                        // Kirim notifikasi detail member
+                        $pemesananList = Pemesanan::where('user_id', $pemesanan->user_id)
+                            ->where('kode_pemesanan', 'LIKE', 'MBR-%')
+                            ->get();
+
+                        // Kirim notifikasi sisa bayar untuk semua pesanan member
+                        foreach ($pemesananList as $pesananMember) {
+                            NotifikasiHelper::kirimNotifikasiPembayaran($pesananMember);
+                        }
+
+                        // Kirim notifikasi detail member
+                        NotifikasiHelper::kirimNotifikasiDetailMember($pemesananList->toArray());
+                    } else {
+                        // Kirim notifikasi detail pemesanan biasa
+                        NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
+
+                        // Kirim notifikasi sisa bayar untuk pesanan biasa
+                        NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
+                    }
                 } elseif ($request->transaction_status == 'pending') {
                     // User baru memilih metode pembayaran, status tetap pending
                     $pemesanan->status = 'pending';
