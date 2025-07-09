@@ -59,27 +59,39 @@ class NotifikasiHelper
         }
     }
 
-    public static function kirimNotifikasiDetailPemesanan(Pemesanan $pemesanan)
+    public static function kirimNotifikasiDetailPemesanan(Pemesanan $pemesanan, $isUpdated = false)
     {
-        // Ini adalah fungsi yang sebelumnya bernama kirimNotifikasiPemesananBaru
-        // Logic tetap sama seperti sebelumnya
         $phoneNumber = $pemesanan->no_telepon;
 
         if (substr($phoneNumber, 0, 1) === '0') {
             $phoneNumber = '62' . substr($phoneNumber, 1);
         }
 
-        $message = "Halo, *{$pemesanan->nama_tim}*!\n\n"
-            . "Terima kasih telah melakukan pemesanan di Minisoccer KJ.\n\n"
-            . "*Detail Pemesanan:*\n"
-            . "🏟️ Lapangan: {$pemesanan->lapangan}\n"
-            . "📅 Tanggal: " . date('d/m/Y', strtotime($pemesanan->tanggal)) . "\n"
-            . "⏰ Jam Main: {$pemesanan->jam_mulai} - {$pemesanan->jam_selesai}\n"
-            . "💰 Total Harga: Rp " . number_format($pemesanan->harga, 0, ',', '.') . "\n"
-            . "💳 DP: Rp " . number_format($pemesanan->dp, 0, ',', '.') . "\n"
-            . "🔄 Sisa Bayar: Rp " . number_format($pemesanan->sisa_bayar, 0, ',', '.') . "\n\n"
-            . "Silahkan datang 15 menit sebelum jadwal bermain.\n"
-            . "Kode Pemesanan: *{$pemesanan->kode_pemesanan}*";
+        if ($isUpdated) {
+            $message = "Halo, *{$pemesanan->nama_tim}*!\n\n"
+                . "ℹ️ Pemesanan Anda telah diperbarui.\n\n"
+                . "*Detail Pemesanan Terbaru:*\n"
+                . "🏟️ Lapangan: {$pemesanan->lapangan}\n"
+                . "📅 Tanggal: " . date('d/m/Y', strtotime($pemesanan->tanggal)) . "\n"
+                . "⏰ Jam Main: {$pemesanan->jam_mulai} - {$pemesanan->jam_selesai}\n"
+                . "💰 Total Harga: Rp " . number_format($pemesanan->harga, 0, ',', '.') . "\n"
+                . "💳 DP: Rp " . number_format($pemesanan->dp, 0, ',', '.') . "\n"
+                . "🔄 Sisa Bayar: Rp " . number_format($pemesanan->sisa_bayar, 0, ',', '.') . "\n\n"
+                . "Silahkan datang 15 menit sebelum jadwal bermain.\n"
+                . "Kode Pemesanan: *{$pemesanan->kode_pemesanan}*";
+        } else {
+            $message = "Halo, *{$pemesanan->nama_tim}*!\n\n"
+                . "Terima kasih telah melakukan pemesanan di Minisoccer KJ.\n\n"
+                . "*Detail Pemesanan:*\n"
+                . "🏟️ Lapangan: {$pemesanan->lapangan}\n"
+                . "📅 Tanggal: " . date('d/m/Y', strtotime($pemesanan->tanggal)) . "\n"
+                . "⏰ Jam Main: {$pemesanan->jam_mulai} - {$pemesanan->jam_selesai}\n"
+                . "💰 Total Harga: Rp " . number_format($pemesanan->harga, 0, ',', '.') . "\n"
+                . "💳 DP: Rp " . number_format($pemesanan->dp, 0, ',', '.') . "\n"
+                . "🔄 Sisa Bayar: Rp " . number_format($pemesanan->sisa_bayar, 0, ',', '.') . "\n\n"
+                . "Silahkan datang 15 menit sebelum jadwal bermain.\n"
+                . "Kode Pemesanan: *{$pemesanan->kode_pemesanan}*";
+        }
 
         $response = Http::withHeaders([
             'Authorization' => config('services.fonnte.token'),
@@ -89,10 +101,10 @@ class NotifikasiHelper
             'countryCode' => '',
         ]);
 
-        Log::info("Fonnte API Response for new booking: " . $response->body());
+        Log::info("Fonnte API Response for detail pemesanan: " . $response->body());
 
         if ($response->failed()) {
-            Log::error('Gagal mengirim notifikasi WhatsApp pemesanan baru: ' . $response->body());
+            Log::error('Gagal mengirim notifikasi WhatsApp detail pemesanan: ' . $response->body());
         }
     }
 

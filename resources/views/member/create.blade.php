@@ -45,7 +45,8 @@
                                     <label for="jam_mulai_{{ $i }}"
                                         class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
                                     <select name="jam_mulai[]" id="jam_mulai_{{ $i }}"
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                                        onchange="updateJamSelesaiMember({{ $i }})">
                                         <option value="">Pilih Jam Mulai</option>
                                         @for ($hour = 7; $hour <= 22; $hour++)
                                             <option value="{{ sprintf('%02d:00', $hour) }}">{{ sprintf('%02d:00', $hour) }}
@@ -59,10 +60,6 @@
                                     <select name="jam_selesai[]" id="jam_selesai_{{ $i }}"
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
                                         <option value="">Pilih Jam Selesai</option>
-                                        @for ($hour = 8; $hour <= 23; $hour++)
-                                            <option value="{{ sprintf('%02d:00', $hour) }}">
-                                                {{ sprintf('%02d:00', $hour) }}</option>
-                                        @endfor
                                     </select>
                                 </div>
                             </div>
@@ -93,12 +90,29 @@
                 <div class="mb-8">
                     <label for="dp" class="block text-sm font-medium text-gray-700 mb-1">DP (Minimal 400.000)</label>
                     <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">Rp</span>
+                        <input type="number" name="dp" id="dpInput" min="400000"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            required placeholder="Minimal DP Rp 400.000">
+                        
+                        <!-- Tambahkan div untuk informasi biaya -->
+                        <div id="biayaInfoContainer" class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200" style="display: none;">
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">DP yang dibayar:</span>
+                                    <span id="dpAmount" class="font-medium">0</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-600">Biaya tambahan (0.7%):</span>
+                                    <span id="biayaTambahanAmount" class="font-medium text-emerald-600">0</span>
+                                </div>
+                                <div class="border-t border-gray-200 mt-2 pt-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-800 font-medium">Total yang dibayar:</span>
+                                        <span id="totalAmount" class="font-bold text-emerald-700">0</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <input type="number" name="dp"
-                            class="w-full pl-12 rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
-                            required>
                     </div>
                 </div>
 
@@ -162,34 +176,14 @@
                 return;
             }
 
-            // Validasi jam dan tanggal tiap jadwal
-            for (let i = 0; i < tanggal.length; i++) {
-                if (tanggal[i] || jam_mulai[i] || jam_selesai[i]) {
-                    if (!tanggal[i] || !jam_mulai[i] || !jam_selesai[i]) {
-                        Swal.fire('Gagal!', `Jadwal ke-${i + 1} belum lengkap.`, 'error');
-                        return;
-                    }
-                    const [jamMulaiHour, jamMulaiMinute] = jam_mulai[i].split(":").map(Number);
-                    const [jamSelesaiHour, jamSelesaiMinute] = jam_selesai[i].split(":").map(Number);
-                    if (jamMulaiMinute !== 0 || jamSelesaiMinute !== 0) {
-                        Swal.fire('Gagal!',
-                            `Jam mulai/selesai pada jadwal ke-${i + 1} harus tepat di menit 00.`,
-                            'error');
-                        return;
-                    }
-                    if (jamSelesaiHour <= jamMulaiHour) {
-                        Swal.fire('Gagal!',
-                            `Jam selesai harus lebih besar dari jam mulai pada jadwal ke-${i + 1}.`,
-                            'error');
-                        return;
-                    }
-                }
-            }
+            // Hitung biaya tambahan
+            const biayaTambahan = Math.ceil(dp * 0.007); // Hitung biaya tambahan 0.7%
+            const totalBayar = dp + biayaTambahan; // Total yang akan ditampilkan ke Snap Midtrans
 
             Swal.fire({
                 icon: 'info',
                 title: 'Mohon Tunggu',
-                text: 'Menyimpan data pemesanan...',
+                text: `Menyimpan data pemesanan... Biaya tambahan sebesar Rp ${biayaTambahan} akan dikenakan.`,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -235,7 +229,7 @@
                         },
                         body: JSON.stringify({
                             order_id: data.kode_pemesanan,
-                            dp: data.dp,
+                            dp: totalBayar, // Kirim total bayar ke Snap Midtrans
                             nama_tim: data.nama_tim,
                             no_telepon: data.no_telepon,
                             lapangan: data.lapangan,
@@ -343,6 +337,69 @@
                         });
                     });
                 });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID').format(angka);
+        }
+
+        // Fungsi update biaya tambahan
+        function updateBiayaTambahan() {
+            const dpInput = document.getElementById('dpInput');
+            const dp = parseInt(dpInput.value) || 0;
+            const biayaTambahan = Math.ceil(dp * 0.007);
+            const total = dp + biayaTambahan;
+
+            // Update tampilan
+            document.getElementById('dpAmount').innerText = `Rp ${formatRupiah(dp)}`;
+            document.getElementById('biayaTambahanAmount').innerText = `Rp ${formatRupiah(biayaTambahan)}`;
+            document.getElementById('totalAmount').innerText = `Rp ${formatRupiah(total)}`;
+
+            // Tampilkan/sembunyikan container berdasarkan input
+            const container = document.getElementById('biayaInfoContainer');
+            if (dp > 0) {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Event listener untuk input DP
+        const dpInput = document.getElementById('dpInput');
+        dpInput.addEventListener('input', updateBiayaTambahan);
+
+        // Inisialisasi - sembunyikan container biaya
+        document.getElementById('biayaInfoContainer').style.display = 'none';
+
+        // Tambahkan fungsi ini di dalam script yang sudah ada
+        function updateJamSelesaiMember(index) {
+            const jamMulaiSelect = document.querySelector(`select[name="jam_mulai[]"][id="jam_mulai_${index}"]`);
+            const jamSelesaiSelect = document.querySelector(`select[name="jam_selesai[]"][id="jam_selesai_${index}"]`);
+            const selectedJamMulai = jamMulaiSelect.value;
+
+            // Reset jam selesai
+            jamSelesaiSelect.innerHTML = '<option value="">Pilih Jam Selesai</option>';
+
+            if (selectedJamMulai) {
+                const jamMulai = parseInt(selectedJamMulai.split(':')[0]);
+
+                // Tambahkan opsi jam selesai mulai dari jam berikutnya sampai 23:00
+                for (let i = jamMulai + 1; i <= 23; i++) {
+                    const option = document.createElement('option');
+                    option.value = `${String(i).padStart(2, '0')}:00`;
+                    option.textContent = `${String(i).padStart(2, '0')}:00`;
+                    jamSelesaiSelect.appendChild(option);
+                }
+            }
+        }
+
+        // Tambahkan event listener untuk setiap jam mulai
+        for (let i = 0; i < 4; i++) {
+            const jamMulaiSelect = document.querySelector(`select[name="jam_mulai[]"][id="jam_mulai_${i}"]`);
+            if (jamMulaiSelect) {
+                jamMulaiSelect.addEventListener('change', () => updateJamSelesaiMember(i));
+            }
         }
     });
 </script>

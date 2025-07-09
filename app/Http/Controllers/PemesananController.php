@@ -334,6 +334,7 @@ class PemesananController extends Controller
             ]);
 
             NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true); // kirim notifikasi update
+            NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan, true);
             DB::commit();
 
             return redirect()->route('pemesanan.detail')->with('success', 'Pemesanan berhasil diperbarui!');
@@ -393,11 +394,12 @@ class PemesananController extends Controller
         \Midtrans\Config::$is3ds = true;
 
         $orderId = $request->order_id; // kode_pemesanan dari database
+        $dpWithFee = $request->dp; // Total bayar termasuk biaya tambahan
 
         $itemDetails = [
             [
                 'id' => $orderId,
-                'price' => (int) $request->dp,
+                'price' => (int) $dpWithFee,
                 'quantity' => 1,
                 'name' => 'DP Sewa Lapangan ' . ($request->lapangan ?? ''),
 
@@ -414,7 +416,7 @@ class PemesananController extends Controller
         $params = [
             'transaction_details' => [
                 'order_id' => $orderId,
-                'gross_amount' => (int) $request->dp,
+                'gross_amount' => (int) $dpWithFee,
             ],
             'customer_details' => [
                 'first_name' => $request->nama_tim,

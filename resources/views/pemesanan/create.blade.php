@@ -65,9 +65,6 @@
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 required>
                                 <option value="" disabled selected>Pilih Jam Selesai</option>
-                                @for ($i = 8; $i <= 23; $i++)
-                                    <option value="{{ sprintf('%02d:00', $i) }}">{{ sprintf('%02d:00', $i) }}</option>
-                                @endfor
                             </select>
                         </div>
                     </div>
@@ -102,8 +99,27 @@
                         </label>
                         <input type="number" name="dp" id="dpInput" min="100000"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            required placeholder="Minimal DP Rp 100.000">
-                        <span id="dpWarning" class="text-red-500 text-sm mt-2 hidden">Minimal DP Rp 100.000!</span>
+                            required placeholder="Minimal DP Rp 100.000" onchange="updateBiayaTambahan()">
+    
+                        <!-- Tambahkan div untuk informasi biaya -->
+                        <div id="biayaInfoContainer" class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">DP yang dibayar:</span>
+                                    <span id="dpAmount" class="font-medium">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-600">Biaya tambahan (0.7%):</span>
+                                    <span id="biayaTambahanAmount" class="font-medium text-emerald-600">Rp 0</span>
+                                </div>
+                                <div class="border-t border-gray-200 mt-2 pt-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-800 font-medium">Total yang dibayar:</span>
+                                        <span id="totalAmount" class="font-bold text-emerald-700">Rp 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-6 flex justify-end space-x-2">
                         <button type="button"
@@ -139,8 +155,7 @@
             };
 
             // Validasi frontend
-            if (!formData.tanggal || !formData.lapangan || !formData.jam_mulai || !formData.jam_selesai || !formData
-                .nama_tim || !formData.no_telepon || !formData.dp) {
+            if (!formData.tanggal || !formData.lapangan || !formData.jam_mulai || !formData.jam_selesai || !formData.nama_tim || !formData.no_telepon || !formData.dp) {
                 Swal.fire('Gagal!', 'Semua field wajib diisi.', 'error');
                 return;
             }
@@ -148,21 +163,14 @@
                 Swal.fire('Gagal!', 'Minimal DP Rp 100.000!', 'error');
                 return;
             }
-            const [jamMulaiHour, jamMulaiMinute] = formData.jam_mulai.split(":").map(Number);
-            const [jamSelesaiHour, jamSelesaiMinute] = formData.jam_selesai.split(":").map(Number);
-            if (jamMulaiMinute !== 0 || jamSelesaiMinute !== 0) {
-                Swal.fire('Gagal!', 'Jam mulai dan selesai harus tepat di menit 00.', 'error');
-                return;
-            }
-            if (jamSelesaiHour <= jamMulaiHour) {
-                Swal.fire('Gagal!', 'Jam selesai harus lebih besar dari jam mulai.', 'error');
-                return;
-            }
+
+            const biayaTambahan = Math.ceil(formData.dp * 0.007); // Hitung biaya tambahan 0.7%
+            const totalBayar = formData.dp + biayaTambahan; // Total yang akan ditampilkan ke Snap Midtrans
 
             Swal.fire({
                 icon: 'info',
                 title: 'Mohon Tunggu',
-                text: 'Menyimpan data pemesanan...',
+                text: `Menyimpan data pemesanan... Biaya tambahan sebesar Rp ${biayaTambahan} akan dikenakan.`,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -199,7 +207,7 @@
                         },
                         body: JSON.stringify({
                             order_id: data.kode_pemesanan,
-                            dp: data.dp,
+                            dp: totalBayar, // Kirim total bayar ke Snap Midtrans
                             nama_tim: data.nama_tim,
                             no_telepon: data.no_telepon,
                             lapangan: data.lapangan,
@@ -219,8 +227,7 @@
                     snap.pay(data.snapToken, {
                         onSuccess: function(result) {
                             Swal.fire('Berhasil!', 'Pembayaran berhasil.', 'success').then(() => {
-                                window.location.href =
-                                    "{{ route('pemesanan.detail') }}?success=1";
+                                window.location.href = "{{ route('pemesanan.detail') }}?success=1";
                             });
                         },
                         onPending: function(result) {
@@ -348,9 +355,58 @@
                 });
         }
 
+        function updateJamSelesai() {
+            const jamMulaiSelect = document.getElementById('jam_mulai');
+            const jamSelesaiSelect = document.getElementById('jam_selesai');
+            const selectedJamMulai = jamMulaiSelect.value;
+
+            // Reset jam selesai
+            jamSelesaiSelect.innerHTML = '<option value="" disabled selected>Pilih Jam Selesai</option>';
+
+            if (selectedJamMulai) {
+                const jamMulai = parseInt(selectedJamMulai.split(':')[0]);
+                
+                // Tambahkan opsi jam selesai mulai dari jam berikutnya sampai 23:00
+                for (let i = jamMulai + 1; i <= 23; i++) {
+                    const option = document.createElement('option');
+                    option.value = `${String(i).padStart(2, '0')}:00`;
+                    option.textContent = `${String(i).padStart(2, '0')}:00`;
+                    jamSelesaiSelect.appendChild(option);
+                }
+            }
+
+            // Update tampilan harga setelah mengubah jam
+            hitungHarga();
+        }
+
         // Event listener untuk select
         ['lapangan', 'jam_mulai', 'jam_selesai'].forEach(id => {
             document.getElementById(id).addEventListener('change', hitungHarga);
         });
+
+        // Tambahkan event listener untuk jam_mulai
+        document.getElementById('jam_mulai').addEventListener('change', updateJamSelesai);
+
+        function updateBiayaTambahan() {
+            const dpInput = document.getElementById('dpInput');
+            const dp = parseInt(dpInput.value) || 0;
+            const biayaTambahan = Math.ceil(dp * 0.007);
+            const total = dp + biayaTambahan;
+
+            // Update tampilan
+            document.getElementById('dpAmount').innerText = `Rp ${formatRupiah(dp)}`;
+            document.getElementById('biayaTambahanAmount').innerText = `Rp ${formatRupiah(biayaTambahan)}`;
+            document.getElementById('totalAmount').innerText = `Rp ${formatRupiah(total)}`;
+
+            // Tampilkan/sembunyikan container berdasarkan input
+            const container = document.getElementById('biayaInfoContainer');
+            container.style.display = dp > 0 ? 'block' : 'none';
+        }
+
+        // Inisialisasi
+        document.getElementById('biayaInfoContainer').style.display = 'none';
+        
+        // Tambahkan event listener untuk input real-time
+        document.getElementById('dpInput').addEventListener('input', updateBiayaTambahan);
     </script>
 @endsection
