@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use App\Models\Pemesanan;
+use App\Models\Refund;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -152,6 +153,44 @@ class NotifikasiHelper
 
         if ($response->failed()) {
             Log::error('Gagal mengirim notifikasi WhatsApp detail member: ' . $response->body());
+        }
+    }
+
+    public static function kirimNotifikasiRefundDiSetujui(Refund $refund)
+    {
+        $pemesanan = $refund->pemesanan;
+        $phoneNumber = $pemesanan->no_telepon;
+
+        if (substr($phoneNumber, 0, 1) === '0') {
+            $phoneNumber = '62' . substr($phoneNumber, 1);
+        }
+
+        $message = "Halo, *{$pemesanan->nama_tim}*! 👋\n\n"
+            . "✅ Pengajuan refund Anda telah *DISETUJUI*\n"
+            . "💰 Dana sebesar Rp " . number_format($refund->idr, 0, ',', '.') . " telah dikembalikan.\n\n"
+            . "*Detail Pesanan yang Dibatalkan:*\n"
+            . "🎫 Kode Pemesanan: {$refund->kode_pemesanan}\n"
+            . "🏟️ Lapangan: {$refund->lapangan}\n"
+            . "📅 Tanggal: " . date('d/m/Y', strtotime($refund->tanggal)) . "\n"
+            . "⏰ Jam Main: {$refund->jam_bermain}\n\n"
+            . "ℹ️ *Catatan Penting:*\n"
+            . "• Abaikan jika masih ada notifikasi terkait penyewaan ini karena pesanan Anda telah berhasil dibatalkan.\n"
+            . "• Anda dapat melihat detail refund yang sudah disetujui di: https://minisoccerkj.my.id/refund\n\n"
+            . "Jika ada pertanyaan, jangan ragu untuk menghubungi kami. 🙏\n"
+            . "Terima kasih atas pengertian dan kepercayaan Anda kepada Minisoccer KJ.";
+
+        $response = Http::withHeaders([
+            'Authorization' => config('services.fonnte.token'),
+        ])->asForm()->post('https://api.fonnte.com/send', [
+            'target' => $phoneNumber,
+            'message' => $message,
+            'countryCode' => '',
+        ]);
+
+        Log::info("Fonnte API Response for refund approval: " . $response->body());
+
+        if ($response->failed()) {
+            Log::error('Gagal mengirim notifikasi WhatsApp refund: ' . $response->body());
         }
     }
 }

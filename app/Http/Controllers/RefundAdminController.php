@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Refund;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\NotifikasiHelper;
 
 class RefundAdminController extends Controller
 {
@@ -42,6 +43,9 @@ class RefundAdminController extends Controller
             'status' => 'disetujui',
             'bukti_transfer' => $path,
         ]);
+
+        // Kirim notifikasi WhatsApp
+        NotifikasiHelper::kirimNotifikasiRefundDiSetujui($refund);
 
         // Hapus pemesanan
         $pemesanan->delete();

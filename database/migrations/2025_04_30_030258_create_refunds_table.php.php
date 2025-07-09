@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('kode_pemesanan')->nullable();
             $table->string('lapangan')->nullable();
             $table->date('tanggal')->nullable();
-            $table->time('jam_bermain')->nullable();
+            $table->string('jam_bermain')->nullable();
             $table->decimal('idr', 8, 0)->nullable()->default(0);
             $table->timestamps();
         });

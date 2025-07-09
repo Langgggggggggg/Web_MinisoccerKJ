@@ -65,8 +65,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
-                                            {{ $refund->jam_bermain ??
-                                                ($refund->pemesanan ? $refund->pemesanan->jam_mulai . ' - ' . $refund->pemesanan->jam_selesai : '-') }}
+                                            {{ $refund->jam_bermain }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">

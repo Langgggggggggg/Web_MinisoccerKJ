@@ -351,6 +351,7 @@ class AdminController extends Controller
             ]);
 
             if (!$is_gratis) {
+                NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan);
                 NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan);
             }
             DB::commit();
@@ -434,7 +435,8 @@ class AdminController extends Controller
                 'status'       => $status,
             ]);
 
-            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true);
+            NotifikasiHelper::kirimNotifikasiPembayaran($pemesanan, true); // kirim notifikasi update
+            NotifikasiHelper::kirimNotifikasiDetailPemesanan($pemesanan, true);
 
             DB::commit();
             return redirect()->route('admin.data-pemesanan')
