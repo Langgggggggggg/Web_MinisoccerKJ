@@ -51,7 +51,7 @@
                     <!-- Left Image (Now visible on mobile too) -->
                     <div class="mb-4 lg:mb-0 lg:pr-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
-                            <img src="{{ asset('images/jadwal.png') }}" alt="Buka Menu Jadwal" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/JadwalLapangan.png') }}" alt="Buka Menu Jadwal" class="w-full h-full object-cover">
                         </div>
                     </div>
                     
@@ -100,7 +100,7 @@
                     <!-- Right Image (Now visible on mobile too) -->
                     <div class="mb-4 lg:mb-0 lg:pl-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
-                            <img src="{{ asset('images/form_pemesanan.png') }}" alt="Lengkapi Data" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/FormPesanan.png') }}" alt="Lengkapi Data" class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
