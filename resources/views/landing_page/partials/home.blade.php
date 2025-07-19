@@ -266,7 +266,7 @@
 
                 <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group">
                     <div class="h-56 bg-cover bg-center relative"
-                        style="background-image: url('{{ asset('images/locker_room.jpg') }}')">
+                        style="background-image: url('{{ asset('images/ruangganti.jpg') }}')">
                         <div class="absolute inset-0 bg-black opacity-30 group-hover:opacity-20 transition duration-300">
                         </div>
                         <div class="absolute bottom-0 left-0 p-4">

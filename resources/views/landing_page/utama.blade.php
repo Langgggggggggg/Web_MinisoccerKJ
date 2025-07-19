@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 
 <head>
     <meta charset="utf-8">
@@ -18,19 +18,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-['Poppins'] antialiased bg-white ">
-
+<body class="font-['Poppins'] antialiased bg-white min-h-full flex flex-col">
     {{-- Navbar --}}
     @include('landing_page.partials.navbar')
 
     {{-- Konten utama --}}
-    <main class="container">
+    <main class="flex-grow">
         @yield('content')
     </main>
 
     {{-- Footer --}}
     @include('landing_page.partials.footer')
-
 </body>
 
 </html>

@@ -36,7 +36,7 @@
                     <!-- Right Image (Now visible on mobile too) -->
                     <div class="mb-4 lg:mb-0 lg:pl-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
-                            <img src="{{ asset('images/register.png') }}" alt="Pilih Produk" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/Daftar.png') }}" alt="Pilih Produk" class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                     <!-- Left Image (Now visible on mobile too) -->
                     <div class="mb-4 lg:mb-0 lg:pr-10">
                         <div class="bg-white rounded-xl shadow-sm overflow-hidden h-64 transition-all hover:shadow-md">
-                            <img src="{{ asset('images/metode_pembayaran.png') }}" alt="Pilih Metode Pembayaran" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/pembayaran.png') }}" alt="Pilih Metode Pembayaran" class="w-full h-full object-cover">
                         </div>
                     </div>
                     
@@ -124,11 +124,9 @@
                         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 transition-all hover:shadow-md">
                             <div class="lg:hidden inline-flex mb-4 bg-rose-500 text-white rounded-full w-10 h-10 items-center justify-center font-bold text-lg">4</div>
                             <h3 class="text-2xl font-bold text-gray-900 mb-3">Pilih Cara Pembayaran</h3>
-                            <p class="text-gray-600">Setelah Anda klik tombol "Tambah Pemesanan", Anda akan diarahkan ke halaman pembayaran digital yang aman dan nyaman. Pilih cara pembayaran yang Anda sukai dan ikuti petunjuk selanjutnya untuk menyelesaikan proses pemesanan.</p>
-                            <div class="mt-6 flex flex-wrap gap-2">
-                                <img src="/api/placeholder/40/25" alt="Kartu Kredit" class="h-6 object-contain">
-                                <img src="/api/placeholder/40/25" alt="Transfer Bank" class="h-6 object-contain">
-                                <img src="/api/placeholder/40/25" alt="Dompet Digital" class="h-6 object-contain">
+                            <p class="text-gray-600">Setelah Anda klik tombol "Pesan", Anda akan diarahkan ke halaman pembayaran. Pembayaran hanya dapat dilakukan menggunakan QRIS. Silakan pindai kode QR yang tersedia dan ikuti petunjuk untuk menyelesaikan proses pembayaran.</p>
+                            <div class="mt-6 flex justify-start">
+                                <img src="{{ asset('images/qris.png') }}" alt="QRIS" class="h-5 object-contain">
                             </div>
                         </div>
                     </div>
