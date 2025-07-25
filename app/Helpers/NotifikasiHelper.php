@@ -115,19 +115,13 @@ class NotifikasiHelper
             Log::error('Tidak ada pesanan untuk dikirimkan dalam notifikasi member.');
             return;
         }
-
-        // Ambil nomor telepon dari pesanan pertama (diasumsikan semua pesanan memiliki nomor telepon yang sama)
         $phoneNumber = $pemesananList[0]['no_telepon'];
-
         if (substr($phoneNumber, 0, 1) === '0') {
             $phoneNumber = '62' . substr($phoneNumber, 1);
         }
-
-        // Gabungkan semua detail pesanan ke dalam satu pesan
         $message = "Halo, *{$pemesananList[0]['nama_tim']}*!\n\n"
             . "Selamat! Anda telah menjadi member aktif di Minisoccer KJ.\n\n"
             . "Berikut adalah detail pesanan Anda:\n";
-
         foreach ($pemesananList as $index => $pemesanan) {
             $message .= "\n*Detail Pesanan " . ($index + 1) . ":*\n"
                 . "🏟️ Lapangan: {$pemesanan['lapangan']}\n"
@@ -137,10 +131,7 @@ class NotifikasiHelper
                 . "💳 DP: Rp " . number_format($pemesanan['dp'], 0, ',', '.') . "\n"
                 . "🔄 Sisa Bayar: Rp " . number_format($pemesanan['sisa_bayar'], 0, ',', '.') . "\n";
         }
-
         $message .= "\nTerima kasih telah menjadi member kami. Nikmati berbagai keuntungan eksklusif sebagai member aktif.";
-
-        // Kirim pesan melalui API Fonnte
         $response = Http::withHeaders([
             'Authorization' => config('services.fonnte.token'),
         ])->asForm()->post('https://api.fonnte.com/send', [
@@ -148,9 +139,7 @@ class NotifikasiHelper
             'message' => $message,
             'countryCode' => '',
         ]);
-
         Log::info("Fonnte API Response for member detail: " . $response->body());
-
         if ($response->failed()) {
             Log::error('Gagal mengirim notifikasi WhatsApp detail member: ' . $response->body());
         }
@@ -160,11 +149,9 @@ class NotifikasiHelper
     {
         $pemesanan = $refund->pemesanan;
         $phoneNumber = $pemesanan->no_telepon;
-
         if (substr($phoneNumber, 0, 1) === '0') {
             $phoneNumber = '62' . substr($phoneNumber, 1);
         }
-
         $message = "Halo, *{$pemesanan->nama_tim}*! 👋\n\n"
             . "✅ Pengajuan refund Anda telah *DISETUJUI*\n"
             . "💰 Dana sebesar Rp " . number_format($refund->idr, 0, ',', '.') . " telah dikembalikan.\n\n"
@@ -178,7 +165,6 @@ class NotifikasiHelper
             . "• Anda dapat melihat detail refund yang sudah disetujui di: https://minisoccerkj.my.id/refund\n\n"
             . "Jika ada pertanyaan, jangan ragu untuk menghubungi kami. 🙏\n"
             . "Terima kasih atas pengertian dan kepercayaan Anda kepada Minisoccer KJ.";
-
         $response = Http::withHeaders([
             'Authorization' => config('services.fonnte.token'),
         ])->asForm()->post('https://api.fonnte.com/send', [
@@ -186,9 +172,7 @@ class NotifikasiHelper
             'message' => $message,
             'countryCode' => '',
         ]);
-
         Log::info("Fonnte API Response for refund approval: " . $response->body());
-
         if ($response->failed()) {
             Log::error('Gagal mengirim notifikasi WhatsApp refund: ' . $response->body());
         }

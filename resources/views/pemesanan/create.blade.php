@@ -164,20 +164,42 @@
                 return;
             }
 
-            const biayaTambahan = Math.ceil(formData.dp * 0.007); // Hitung biaya tambahan 0.7%
-            const totalBayar = formData.dp + biayaTambahan; // Total yang akan ditampilkan ke Snap Midtrans
-
-            Swal.fire({
-                icon: 'info',
-                title: 'Mohon Tunggu',
-                text: `Menyimpan data pemesanan... Biaya tambahan sebesar Rp ${biayaTambahan} akan dikenakan.`,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+            fetch("/pemesanan/validateSchedule", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({
+                    tanggal: formData.tanggal,
+                    lapangan: formData.lapangan,
+                    jam_mulai: formData.jam_mulai,
+                    jam_selesai: formData.jam_selesai
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire('Gagal!', data.message || 'Jadwal tidak tersedia.', 'error');
+                    throw new Error(data.message || 'Jadwal tidak tersedia.');
                 }
-            });
 
-            fetch("/pemesanan/store", {
+                // Jika valid, lanjut proses booking seperti biasa
+                const biayaTambahan = Math.ceil(formData.dp * 0.007); // Hitung biaya tambahan 0.7%
+                const totalBayar = formData.dp + biayaTambahan; // Total yang akan ditampilkan ke Snap Midtrans
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Mohon Tunggu',
+                    text: `Sedang memproses pembayaran...`,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                return fetch("/pemesanan/store", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -248,6 +270,10 @@
                     Swal.fire('Gagal!', error.message, 'error');
                     console.error("Error:", error);
                 });
+            })
+            .catch(error => {
+                // Sudah ditangani di atas
+            });
         });
 
         function formatRupiah(angka) {

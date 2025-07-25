@@ -143,7 +143,7 @@
         const btnPesan = document.getElementById('btnPesanMember');
         if (!btnPesan) return;
 
-        btnPesan.addEventListener('click', function() {
+        btnPesan.addEventListener('click', async function() {
             // Ambil data form
             let tanggal = Array.from(document.querySelectorAll('input[name="tanggal[]"]')).map(e => e.value);
             let jam_mulai = Array.from(document.querySelectorAll('select[name="jam_mulai[]"]')).map(e => e.value);
@@ -176,6 +176,32 @@
                 return;
             }
 
+            // --- VALIDASI HARI LIBUR (SENIN) UNTUK SETIAP JADWAL YANG DIISI ---
+            for (let i = 0; i < tanggal.length; i++) {
+                if (tanggal[i] && jam_mulai[i] && jam_selesai[i]) {
+                    let res = await fetch("/pemesanan/validateSchedule", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: JSON.stringify({
+                            tanggal: tanggal[i],
+                            lapangan: lapangan,
+                            jam_mulai: jam_mulai[i],
+                            jam_selesai: jam_selesai[i]
+                        }),
+                    });
+                    let data = await res.json();
+                    if (!data.success) {
+                        Swal.fire('Gagal!', data.message || 'Jadwal tidak tersedia.', 'error');
+                        return;
+                    }
+                }
+            }
+            // --- END VALIDASI HARI LIBUR ---
+
             // Hitung biaya tambahan
             const biayaTambahan = Math.ceil(dp * 0.007); // Hitung biaya tambahan 0.7%
             const totalBayar = dp + biayaTambahan; // Total yang akan ditampilkan ke Snap Midtrans
@@ -183,7 +209,7 @@
             Swal.fire({
                 icon: 'info',
                 title: 'Mohon Tunggu',
-                text: `Menyimpan data pemesanan... Biaya tambahan sebesar Rp ${biayaTambahan} akan dikenakan.`,
+                text: `Sedang memproses pembayaran...`,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -192,83 +218,83 @@
 
             // Kirim data ke backend via AJAX
             fetch("/pemesanan/member", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({
+                    tanggal: tanggal,
+                    lapangan: lapangan,
+                    jam_mulai: jam_mulai,
+                    jam_selesai: jam_selesai,
+                    nama_tim: nama_tim,
+                    no_telepon: no_telepon,
+                    dp: dp
+                }),
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    let err = await response.json();
+                    throw new Error(err.error || 'Gagal menyimpan pemesanan.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire('Gagal!', data.error || 'Gagal menyimpan pemesanan.', 'error');
+                    throw new Error(data.error || 'Gagal menyimpan pemesanan.');
+                }
+                // Setelah tersimpan, lanjut Snap Midtrans
+                return fetch("/pemesanan/getSnapToken", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "X-Requested-With": "XMLHttpRequest"
                     },
                     body: JSON.stringify({
-                        tanggal: tanggal,
-                        lapangan: lapangan,
-                        jam_mulai: jam_mulai,
-                        jam_selesai: jam_selesai,
-                        nama_tim: nama_tim,
-                        no_telepon: no_telepon,
-                        dp: dp
-                    }),
-                })
-                .then(async response => {
-                    if (!response.ok) {
-                        let err = await response.json();
-                        throw new Error(err.error || 'Gagal menyimpan pemesanan.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data.success) {
-                        Swal.fire('Gagal!', data.error || 'Gagal menyimpan pemesanan.', 'error');
-                        throw new Error(data.error || 'Gagal menyimpan pemesanan.');
-                    }
-                    // Setelah tersimpan, lanjut Snap Midtrans
-                    return fetch("/pemesanan/getSnapToken", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        },
-                        body: JSON.stringify({
-                            order_id: data.kode_pemesanan,
-                            dp: totalBayar, // Kirim total bayar ke Snap Midtrans
-                            nama_tim: data.nama_tim,
-                            no_telepon: data.no_telepon,
-                            lapangan: data.lapangan,
-                            tanggal: data.tanggal,
-                            jam_mulai: data.jam_mulai,
-                            jam_selesai: data.jam_selesai,
-                        })
-                    });
-                })
-                .then(response => response.json())
-                .then(data => {
-                    Swal.close();
-                    if (!data.snapToken) {
-                        Swal.fire('Gagal!', 'Gagal mendapatkan token pembayaran.', 'error');
-                        return;
-                    }
-                    snap.pay(data.snapToken, {
-                        onSuccess: function(result) {
-                            Swal.fire('Berhasil!', 'Pembayaran berhasil.', 'success')
-                                .then(() => {
-                                    window.location.href = "{{ route('pemesanan.detail') }}?success=member";
-                                });
-                        },
-                        onPending: function(result) {
-                            Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.', 'info');
-                        },
-                        onError: function(result) {
-                            Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error')
-                                .then(() => {
-                                    window.location.href = "{{ route('pemesanan.detail') }}?error=1";
-                                });
-                        }
-                    });
-                })
-                .catch(error => {
-                    Swal.close();
-                    Swal.fire('Gagal!', error.message, 'error');
-                    console.error("Error:", error);
+                        order_id: data.kode_pemesanan,
+                        dp: totalBayar, // Kirim total bayar ke Snap Midtrans
+                        nama_tim: data.nama_tim,
+                        no_telepon: data.no_telepon,
+                        lapangan: data.lapangan,
+                        tanggal: data.tanggal,
+                        jam_mulai: data.jam_mulai,
+                        jam_selesai: data.jam_selesai,
+                    })
                 });
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.close();
+                if (!data.snapToken) {
+                    Swal.fire('Gagal!', 'Gagal mendapatkan token pembayaran.', 'error');
+                    return;
+                }
+                snap.pay(data.snapToken, {
+                    onSuccess: function(result) {
+                        Swal.fire('Berhasil!', 'Pembayaran berhasil.', 'success')
+                            .then(() => {
+                                window.location.href = "{{ route('pemesanan.detail') }}?success=member";
+                            });
+                    },
+                    onPending: function(result) {
+                        Swal.fire('Menunggu Pembayaran', 'Pembayaran sedang dalam proses.', 'info');
+                    },
+                    onError: function(result) {
+                        Swal.fire('Gagal!', 'Pembayaran gagal. Coba lagi!', 'error')
+                            .then(() => {
+                                window.location.href = "{{ route('pemesanan.detail') }}?error=1";
+                            });
+                    }
+                });
+            })
+            .catch(error => {
+                Swal.close();
+                Swal.fire('Gagal!', error.message, 'error');
+                console.error("Error:", error);
+            });
         });
 
         window.updateAvailableHoursMember = function(index) {
