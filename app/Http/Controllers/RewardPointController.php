@@ -56,7 +56,7 @@ class RewardPointController extends Controller
         try {
             $reward = RewardPoint::findOrFail($id);
 
-            if ($reward->point < 1) {
+            if ($reward->point < 10) {
                 return redirect()->back()->with('error', 'Anda harus memiliki minimal 10 point untuk mencetak invoice');
             }
 

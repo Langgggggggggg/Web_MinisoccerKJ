@@ -7,7 +7,7 @@
 @section('content')
     <div class="max-w-xl mx-auto p-4 bg-white shadow-md rounded">
         <h2 class="text-2xl font-bold mb-4">
-            <i class="fas fa-edit mr-2"></i> Ubah Jadwal Pemesanan
+            <i class="fas fa-edit mr-2"></i> Ubah Jadwal Pemesanann
         </h2>
 
         <form action="{{ route('pemesanan.update', $pemesanan->kode_pemesanan) }}" method="POST">
@@ -133,6 +133,30 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        // Validasi tanggal agar tidak bisa pilih tanggal yang sudah lewat
+        document.addEventListener('DOMContentLoaded', function() {
+            const tanggalInput = document.getElementById('tanggal');
+            if (tanggalInput) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const formattedDate = today.toISOString().split('T')[0];
+                tanggalInput.setAttribute('min', formattedDate);
+
+                tanggalInput.addEventListener('input', function() {
+                    const selectedDate = new Date(this.value);
+                    selectedDate.setHours(0, 0, 0, 0);
+                    if (selectedDate < today) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Tanggal Tidak Valid',
+                            text: 'Tidak dapat memilih tanggal yang sudah lewat!'
+                        });
+                        this.value = formattedDate;
+                    }
+                });
+            }
+        });
+
         function updateAvailableHours() {
             const tanggal = document.querySelector('input[name="tanggal"]').value;
             const lapangan = document.querySelector('select[name="lapangan"]').value;

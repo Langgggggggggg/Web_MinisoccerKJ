@@ -107,6 +107,30 @@
     @endif
 
     <script>
+        // Validasi tanggal agar tidak bisa pilih tanggal yang sudah lewat
+        document.addEventListener('DOMContentLoaded', function() {
+            const tanggalInput = document.querySelector('input[name="tanggal"]');
+            if (tanggalInput) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const formattedDate = today.toISOString().split('T')[0];
+                tanggalInput.setAttribute('min', formattedDate);
+
+                tanggalInput.addEventListener('input', function() {
+                    const selectedDate = new Date(this.value);
+                    selectedDate.setHours(0, 0, 0, 0);
+                    if (selectedDate < today) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Tanggal Tidak Valid',
+                            text: 'Tidak dapat memilih tanggal yang sudah lewat!'
+                        });
+                        this.value = formattedDate;
+                    }
+                });
+            }
+        });
+
         function updateAvailableHours() {
             const tanggal = document.querySelector('input[name="tanggal"]').value;
             const lapangan = document.querySelector('select[name="lapangan"]').value;
