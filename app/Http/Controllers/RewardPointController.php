@@ -7,6 +7,7 @@ use App\Models\RewardPoint;
 use App\Models\Pemesanan;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RewardPointController extends Controller
 {
@@ -52,19 +53,32 @@ class RewardPointController extends Controller
     }
     public function downloadInvoice($id)
     {
-        $reward = RewardPoint::findOrFail($id);
+        try {
+            $reward = RewardPoint::findOrFail($id);
 
-        if ($reward->point < 1) {
-            return redirect()->back()->with('error', 'Anda harus memiliki minimal 10 point untuk mencetak invoice');
+            if ($reward->point < 1) {
+                return redirect()->back()->with('error', 'Anda harus memiliki minimal 10 point untuk mencetak invoice');
+            }
+
+            $totalBermain = $this->hitungTotalBermain($reward->idr);
+            
+            $pdf = PDF::loadView('reward.invoice', compact('reward', 'totalBermain'));
+            $pdf->setPaper('a4', 'portrait');
+            ini_set('memory_limit', '256M');
+
+            return $pdf->download('invoice_' . $reward->kode_voucher . '.pdf', [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="invoice_' . $reward->kode_voucher . '.pdf"'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('PDF Download Error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            // Return dengan redirect dan flash message
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat mengunduh invoice. Silakan coba lagi.');
         }
-
-        // Hitung total bermain di setiap lapangan
-        $totalBermain = $this->hitungTotalBermain($reward->idr);
-        // Generate PDF dari tampilan Blade
-        $pdf = PDF::loadView('reward.invoice', compact('reward', 'totalBermain'));
-
-        // Unduh file PDF dengan nama unik
-        return $pdf->download('invoice_' . $reward->kode_voucher . '.pdf');
     }
 }
 
