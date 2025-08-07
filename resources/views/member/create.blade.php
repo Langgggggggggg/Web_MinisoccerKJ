@@ -427,5 +427,42 @@
                 jamMulaiSelect.addEventListener('change', () => updateJamSelesaiMember(i));
             }
         }
+
+        // Tambahkan fungsi setMinDate untuk semua input tanggal member
+        function setMinDateMember() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate()); // Menggunakan tanggal hari ini
+            
+            // Format tanggal ke YYYY-MM-DD
+            const formattedDate = tomorrow.toISOString().split('T')[0];
+            
+            // Set min attribute untuk setiap input tanggal
+            for(let i = 0; i < 4; i++) {
+                const tanggalInput = document.getElementById(`tanggal_${i}`);
+                if(tanggalInput) {
+                    tanggalInput.setAttribute('min', formattedDate);
+                    
+                    // Tambahkan event listener untuk validasi real-time
+                    tanggalInput.addEventListener('input', function() {
+                        const selectedDate = new Date(this.value);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        if (selectedDate < today) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Tanggal Tidak Valid',
+                                text: 'Tidak dapat memilih tanggal yang sudah lewat!'
+                            });
+                            this.value = formattedDate;
+                        }
+                    });
+                }
+            }
+        }
+
+        // Panggil fungsi setMinDateMember saat halaman dimuat
+        setMinDateMember();
     });
 </script>

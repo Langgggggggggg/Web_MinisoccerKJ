@@ -434,5 +434,39 @@
         
         // Tambahkan event listener untuk input real-time
         document.getElementById('dpInput').addEventListener('input', updateBiayaTambahan);
+
+        function setMinDate() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate()); // Menggunakan tanggal hari ini
+            
+            // Format tanggal ke YYYY-MM-DD
+            const formattedDate = tomorrow.toISOString().split('T')[0];
+            
+            // Set min attribute pada input tanggal
+            const tanggalInput = document.getElementById('tanggal');
+            tanggalInput.setAttribute('min', formattedDate);
+            
+            // Disable tanggal yang sudah lewat
+            tanggalInput.addEventListener('input', function() {
+                const selectedDate = new Date(this.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < today) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Tanggal Tidak Valid',
+                        text: 'Tidak dapat memilih tanggal yang sudah lewat!'
+                    });
+                    this.value = formattedDate;
+                }
+            });
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            setMinDate();
+        });
     </script>
 @endsection

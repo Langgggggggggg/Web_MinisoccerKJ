@@ -52,7 +52,7 @@ class PenawaranMemberController extends Controller
             $showMembershipOffer = false;
         } else {
             // Jika belum pernah jadi member dan sudah booking minimal 1x, tawarkan jadi member
-            if ($bookingCount >= 4) {
+            if ($bookingCount >= 1) {
                 $showMembershipOffer = true;
             }
         }
