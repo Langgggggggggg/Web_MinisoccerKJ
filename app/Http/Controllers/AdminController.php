@@ -214,7 +214,7 @@ class AdminController extends Controller
 
         if ($rewardPoint) {
             // Jika reward point belum 10, tidak bisa ditukar
-            if ($rewardPoint->point < 1) {
+            if ($rewardPoint->point < 10) {
                 return redirect()->route('admin.konfirmasi-penukaran-poin')->with('error', 'Mohon maaf, point anda belum mencapai 10. Silakan bermain terlebih dahulu dan kumpulkan point anda untuk melakukan penukaran.');
             }
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RewardPoint;
 use App\Models\Pemesanan;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -62,7 +62,7 @@ class RewardPointController extends Controller
 
             $totalBermain = $this->hitungTotalBermain($reward->idr);
             
-            $pdf = PDF::loadView('reward.invoice', compact('reward', 'totalBermain'));
+            $pdf = Pdf::loadView('reward.invoice', compact('reward', 'totalBermain'));
             $pdf->setPaper('a4', 'portrait');
             ini_set('memory_limit', '256M');
 
